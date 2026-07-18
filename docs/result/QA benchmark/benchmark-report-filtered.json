@@ -1,0 +1,303 @@
+{
+  "schema_version": "mozaika-benchmark-report/v2",
+  "generated_at": "2026-07-18",
+  "variant": "external_failures_excluded_artifact_yield_success",
+  "evidence_policy": "available_logs_results_and_artifacts_only",
+  "corpus_unit": "ouroboros_task_result",
+  "corpus_note": "Parent and child task results may both be present; this preserves comparability with the previous report.",
+  "corpus": {
+    "all_task_result_files": 109,
+    "mozaika_related_task_records": 88,
+    "excluded_external_technical": 19,
+    "excluded_external_cancelled_or_stuck": 6,
+    "excluded_total": 25,
+    "eligible_task_records": 63,
+    "service_records_excluded_from_e2e_only": 23,
+    "production_e2e_records": 40,
+    "new_records_since_previous_report": 11,
+    "new_records_excluded_as_pure_external_failures": 0,
+    "eligible_status_distribution": {
+      "completed": 63
+    },
+    "eligible_execution_distribution": {
+      "ok": 35,
+      "degraded": 28
+    },
+    "eligible_reason_distribution": {
+      "final_message": 40,
+      "tool_failure": 23
+    }
+  },
+  "exclusions": [
+    {
+      "category": "provider_unavailable",
+      "count": 12,
+      "task_ids": ["07c47f64", "12ff0e3c", "2a55e30a", "519bfd37", "5b42790b", "63637779", "689c2ead", "8bbb1007", "96b80a77", "fa7a02ab", "fc8152ea", "fe77df35"],
+      "evidence": "Terminal reason_code=provider_unavailable."
+    },
+    {
+      "category": "malformed_tool_protocol",
+      "count": 4,
+      "task_ids": ["2145eb35", "42950551", "9cf0e3b0", "e4937911"],
+      "evidence": "failure.kind=provider; model returned an unparsable tool call."
+    },
+    {
+      "category": "orphaned_running_after_worker_restart",
+      "count": 2,
+      "task_ids": ["c642a3dc", "cf38d31b"],
+      "evidence": "Task was lost during worker restart."
+    },
+    {
+      "category": "workspace_unusable_before_start",
+      "count": 1,
+      "task_ids": ["22fc6324"],
+      "evidence": "Task did not start because configured workspace overlapped the Ouroboros data drive."
+    },
+    {
+      "category": "external_cancelled_or_stuck_non_evaluable",
+      "count": 6,
+      "task_ids": ["497e6b8e", "4f268586", "aea287a1", "b8afa403", "bc5398f6", "d9c49c65"],
+      "evidence": "No completed agent outcome; cancellation or worker termination. d9c49c65 was separately confirmed as stuck before work began."
+    }
+  ],
+  "mixed_cases_retained": [
+    {
+      "task_id": "6c61d277",
+      "reason": "model_not_supported plus skill/root argument errors"
+    },
+    {
+      "task_id": "ad98fc67",
+      "reason": "APIConnectionError plus LIST_FILES_ERROR"
+    },
+    {
+      "task_id": "1ca3ac48",
+      "reason": "LibreOffice unavailable plus path errors"
+    },
+    {
+      "task_id": "3593204b",
+      "reason": "LibreOffice unavailable plus path/output errors"
+    }
+  ],
+  "service_records_excluded_from_e2e": [
+    {"task_id": "0f1c4aa0", "role": "launch_dispatcher", "reason": "Policy-blocked assignment read did not prevent launching production task d086af00; artifacts belong to the child task."},
+    {"task_id": "8e60da3e", "role": "owner_choice_forwarder", "reason": "Forwarded choice two_economies into an active campaign; no standalone artifact was expected."},
+    {"task_id": "756d30b0", "role": "launch_dispatcher", "reason": "Created child task aea287a1; the child's external cancellation is already excluded separately."},
+    {"task_id": "8b182d1d", "role": "launch_dispatcher", "reason": "Created production task 069cdc23; outputs are attributed to that child."},
+    {"task_id": "6a96e846", "role": "launch_dispatcher", "reason": "Verified the assignment and created production task d4170c3e."},
+    {"task_id": "e1579349", "role": "owner_choice_forwarder", "reason": "Forwarded card 1 into d4170c3e; this was a human-control step, not artifact generation."},
+    {"task_id": "8ea682ce", "role": "launch_dispatcher", "reason": "Created production task 0ac25b12; artifacts belong to the child campaign."},
+    {"task_id": "1fd9a81c", "role": "stop_and_cleanup", "reason": "User explicitly requested deletion and shutdown; producing a new artifact would contradict the request."},
+    {"task_id": "9bd8a571", "role": "launch_dispatcher", "reason": "Created controller task 16415a78 and performed no independent analysis."},
+    {"task_id": "16415a78", "role": "nested_dispatcher", "reason": "Created actual production task aa49a6d4; its function ended after dispatch."},
+    {"task_id": "c04d12e1", "role": "owner_choice_forwarder", "reason": "Received choice 1 and launched continuation e964b3ed; outputs belong to the continuation."},
+    {"task_id": "1a11938b", "role": "launch_dispatcher", "reason": "Created child 63637779; the child's provider failure is already excluded separately."},
+    {"task_id": "bc87dfed", "role": "launch_dispatcher", "reason": "Created child 2145eb35; the child's malformed provider tool protocol is already excluded."},
+    {"task_id": "bcec62dd", "role": "nested_dispatcher", "reason": "Created child e4937911; excluding both would double-count one external protocol failure."},
+    {"task_id": "6b6661a9", "role": "launch_dispatcher", "reason": "Created child 96b80a77; the child's provider unavailability is already excluded."},
+    {"task_id": "70fde5d0", "role": "stop_and_cleanup", "reason": "Successfully executed a user request to remove temporary files and outputs."},
+    {"task_id": "127ed496", "role": "recovery_dispatcher", "reason": "Found an interrupted task and launched replacement 07c47f64; the replacement's provider failure is separately excluded."},
+    {"task_id": "2cba314e", "role": "launch_dispatcher", "reason": "Verified the assignment and launched production task 4d115c64."},
+    {"task_id": "c964d16e", "role": "owner_choice_forwarder", "reason": "Forwarded variant 1 and launched ad98fc67; no standalone file was expected."},
+    {"task_id": "4c169692", "role": "launch_dispatcher", "reason": "Verified the assignment and launched production task 0436d215."},
+    {"task_id": "30888550", "role": "state_check", "reason": "Confirmed that the pipeline was waiting for owner choice and returned existing artifacts without regenerating them."},
+    {"task_id": "a5564afe", "role": "owner_choice_forwarder", "reason": "Received choice 1 and launched continuation 14923cfd."},
+    {"task_id": "0f3ba634", "role": "launch_dispatcher", "reason": "Verified the assignment and launched production chain 8fa1b67f to 8daef6a0."}
+  ],
+  "observability": {
+    "available_period": ["2026-07-11", "2026-07-17"],
+    "call_records": 10856,
+    "log_line_counts": {
+      "agent_stdout.log": 9751,
+      "server.log": 9469,
+      "events.jsonl": 8351,
+      "tools.jsonl": 2625,
+      "progress.jsonl": 2130,
+      "launcher.log": 474,
+      "supervisor.jsonl": 372,
+      "task_reflections.jsonl": 51,
+      "chat.jsonl": 0
+    }
+  },
+  "metrics": [
+    {
+      "id": "kpi_accuracy",
+      "weight": 20,
+      "threshold": ">=99%",
+      "fact": "20/20 = 100%",
+      "score": 100.0,
+      "status": "PASS"
+    },
+    {
+      "id": "data_reconciliation",
+      "weight": 10,
+      "threshold": ">=95%",
+      "fact": "17/17 = 100%",
+      "score": 100.0,
+      "status": "PASS"
+    },
+    {
+      "id": "claim_grounding",
+      "weight": 15,
+      "threshold": ">=90%",
+      "fact": "18/25 = 72.0%",
+      "score": 72.0,
+      "status": "FAIL"
+    },
+    {
+      "id": "insight_validity",
+      "weight": 10,
+      "threshold": ">=80%",
+      "fact": "N/A — human expert assessment required",
+      "score": null,
+      "status": "N/A",
+      "excluded_from_weighted_total": true
+    },
+    {
+      "id": "artifact_completeness",
+      "weight": 10,
+      "threshold": ">=95%",
+      "fact": "20/24 = 83.3%",
+      "score": 83.3333333333,
+      "status": "FAIL"
+    },
+    {
+      "id": "cross_artifact_consistency",
+      "weight": 10,
+      "threshold": ">=98%",
+      "fact": "18/20 = 90.0%",
+      "score": 90.0,
+      "status": "FAIL"
+    },
+    {
+      "id": "e2e_success_file_validity",
+      "weight": 15,
+      "threshold": ">=90%",
+      "fact": "39/40 = 97.5%",
+      "score": 97.5,
+      "status": "PASS",
+      "success_definition": "production task produced at least one independently evidenced user artifact; service and control records are excluded",
+      "calculation": {
+        "registered_ready_successes": 38,
+        "evidenced_unregistered_successes": 1,
+        "production_attempts": 40,
+        "failures": 1,
+        "rate_pct": 97.5,
+        "evidenced_unregistered_success_task_ids": ["ad98fc67"],
+        "conservative_failure_task_ids": ["65a44087"]
+      },
+      "raw_task_record_diagnostics": {
+        "registered_artifact_successes": 38,
+        "all_eligible_task_records": 63,
+        "registered_artifact_rate_pct": 60.3174603175,
+        "execution_ok": 35,
+        "execution_ok_rate_pct": 55.5555555556
+      }
+    },
+    {
+      "id": "autonomy_time_to_result",
+      "weight": 10,
+      "threshold": "<=1 intervention; <=30% manual baseline",
+      "fact": "weekly: 0 interventions and 337.4 s; insights: 1 intervention and 557.9 s; manual baseline unavailable",
+      "score": null,
+      "status": "N/A",
+      "excluded_from_weighted_total": true,
+      "calculation": {
+        "weekly_autopilot": {
+          "human_interventions": 0,
+          "agent_active_seconds": 337.433379
+        },
+        "insight_deck": {
+          "human_interventions": 1,
+          "agent_active_seconds": 557.917,
+          "wall_clock_seconds": 4425.8
+        },
+        "manual_baseline_seconds": null
+      }
+    }
+  ],
+  "scenarios": {
+    "weekly_autopilot": {
+      "benchmark_label": "scenario_1_regular_report",
+      "task_ids": ["08328cf8"],
+      "score": 94.3,
+      "status": "FAIL",
+      "kpi_accuracy": {
+        "fact": "10/10",
+        "score": 100.0
+      },
+      "data_reconciliation": {
+        "fact": "9/9",
+        "score": 100.0
+      },
+      "claim_grounding": {
+        "fact": "10/12",
+        "score": 83.3333333333,
+        "status": "FAIL"
+      },
+      "artifact_completeness": {
+        "fact": "10/12",
+        "score": 83.3333333333,
+        "defects": [
+          "PPTX slide 3 KPI details are clipped or obscured",
+          "PPTX slide 5 title overlaps the lead sentence"
+        ]
+      },
+      "cross_artifact_consistency": {
+        "fact": "10/10",
+        "score": 100.0
+      },
+      "hard_gates": {
+        "critical_kpi_error": "PASS",
+        "all_required_files_open": "PASS",
+        "claims_grounded": "FAIL",
+        "no_manual_rebuild": "PASS"
+      }
+    },
+    "insight_deck": {
+      "benchmark_label": "scenario_2_insights",
+      "task_ids": ["8fa1b67f", "8daef6a0", "5f0075c0"],
+      "score": 87.7,
+      "status": "FAIL",
+      "kpi_accuracy": {
+        "fact": "10/10",
+        "score": 100.0
+      },
+      "data_reconciliation": {
+        "fact": "8/8",
+        "score": 100.0
+      },
+      "claim_grounding": {
+        "fact": "8/13",
+        "score": 61.5384615385,
+        "status": "FAIL"
+      },
+      "artifact_completeness": {
+        "fact": "10/12",
+        "score": 83.3333333333,
+        "defects": [
+          "PPTX slides 2 and 6 contain '?' placeholders",
+          "PPTX slides 3, 4 and 8 contain 'Option | Option | VS' placeholders"
+        ]
+      },
+      "cross_artifact_consistency": {
+        "fact": "8/10",
+        "score": 80.0
+      },
+      "hard_gates": {
+        "critical_kpi_error": "PASS",
+        "all_required_files_open": "PASS_WITH_CONTENT_DEFECT",
+        "claims_grounded": "FAIL",
+        "no_manual_rebuild": "PASS"
+      }
+    }
+  },
+  "weighted_total": {
+    "accounted_weight": 80,
+    "score": 90.9479166667,
+    "rounded_score": 90.9,
+    "pass_threshold": 85,
+    "hard_fail_count": 2,
+    "status": "FAIL"
+  },
+  "slide_9": "Сценарий 1 — регулярный отчёт: 94.3/100, hard fail · Сценарий 2 — поиск инсайтов: 87.7/100, hard fail · производственный E2E: 97.5% (39/40) · сырой task-level artifact yield: 60.3% · hard fails: 2"
+}

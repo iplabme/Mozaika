@@ -34,6 +34,7 @@ from starlette.responses import JSONResponse
 
 
 _MAX_FIELD_CHARS = 1200
+_MAX_PROMPT_CHARS = 8000
 _MAX_SOURCES = 50
 _MAX_FILES = 500
 _MAX_URL_CHARS = 4096
@@ -1457,6 +1458,8 @@ def _validate_completion_gate(payload: Dict[str, Any]) -> Dict[str, Any]:
             design_errors.append(f"design_receipts[{index}] dashboard contains or did not check storytelling cards")
         dashboard_quality_checks = {
             "aligned_grid", "charts_render_without_errors", "tables_readable", "filters_functional",
+            "filter_options_backed_by_data", "filter_targets_recomputed",
+            "cross_filter_consistent", "no_decorative_controls",
             "filter_reset_works", "table_search_functional", "table_sort_functional",
             "customization_controls_functional", "customization_reset_works",
             "responsive_no_overflow", "empty_states_clear", "console_errors_absent",
@@ -1560,6 +1563,12 @@ def _validate_completion_gate(payload: Dict[str, Any]) -> Dict[str, Any]:
         checks = audit.get("checks") if isinstance(audit.get("checks"), dict) else {}
         if any(checks.get(name) is not True for name in layout_checks):
             layout_errors.append(f"layout_audits[{index}] required geometry checks did not pass")
+        dashboard_interaction_checks = {
+            "filter_options_backed_by_data", "filter_targets_recomputed",
+            "cross_filter_consistent", "no_decorative_controls",
+        }
+        if artifact_type == "dashboard" and any(checks.get(name) is not True for name in dashboard_interaction_checks):
+            layout_errors.append(f"layout_audits[{index}] dashboard data-backed interaction checks did not pass")
         if audit.get("issues") != []:
             layout_errors.append(f"layout_audits[{index}] contains unresolved layout issues")
         viewports = audit.get("viewports") if isinstance(audit.get("viewports"), list) else []
@@ -2146,10 +2155,10 @@ def _request_owner_choice(api: Any, ctx: Any, wait_seconds: int = _CHOICE_WAIT_D
     }, ensure_ascii=False)
 
 
-def _clean(value: Any, *, required: bool = False) -> str:
+def _clean(value: Any, *, required: bool = False, max_chars: int = _MAX_FIELD_CHARS) -> str:
     text = _CONTROL_CHARS.sub("", str(value or "")).strip()
-    if len(text) > _MAX_FIELD_CHARS:
-        raise ValueError(f"поле длиннее {_MAX_FIELD_CHARS} символов")
+    if len(text) > max_chars:
+        raise ValueError(f"поле длиннее {max_chars} символов")
     if required and not text:
         raise ValueError("обязательное поле пусто")
     return text
@@ -2938,12 +2947,13 @@ def _write_assignment_file(api: Any, launch_id: str, scenario: str, fields: Dict
 - если руководитель указал название исследования, сохрани его отдельным полем `research_title_verbatim` без перевода, сокращения или редакторского переименования; включи эту точную строку в заголовок дашборда, единый study-kicker каждой карточки варианта истории и выбранной карточки, storyline и заголовок итоговой презентации; смысловой заголовок варианта не должен дублировать название исследования;
 - все пользовательские и зрительские артефакты очищены от служебной информации: не показывай номера вариантов, внутренние идентификаторы и `claim_ids`, версии схем и контрактов, хеши, файловые пути, названия стадий, статусы проверок и отладочные сведения; ссылки на источники, даты, единицы измерения, определения и полезные оговорки сохраняй; техническую трассировку держи только во внутренних реестрах, контрактах и квитанциях;
 - охват сетевых коллекций не сокращается молча: все дочерние наборы перечислены или явно помечены как недоступные;
+- дашборд включает все данные или воспроизводимые агрегаты для каждого предлагаемого периода, сегмента и другого навигируемого состояния; каждый фильтр, селектор, переключатель, вкладка, легенда и drill-down имеет backing data и объявленные targets, выбранное значение реально участвует в фильтрации/пересчёте KPI, графиков, таблиц, сигналов, выводов и оговорок; изменение только подписи, стиля или значения контрола при фиксированном срезе запрещено; отсутствующий срез означает удалить или явно отключить контрол, а не имитировать интерактивность; до приёмки независимый visual validator проверяет payload и handler path, каждый вариант, комбинацию двух фильтров, empty state и reset с входными и смысловыми выходными сигнатурами;
 - все исходные материалы, исключённые записи и промежуточные результаты сохранены как новые неизменяемые артефакты; удалять или перезаписывать их нельзя;
 - перед каждым этапом Mozaika заново сравнивает готовые внешние скиллы, сначала подходящие установленные Anthropic-скиллы, и сохраняет обоснование выбора; одноразовые непроверенные скрипты не подменяют ролевой контракт;
 - презентацию создаёт роль `mozaika-presentation-agent` только как богатый автономный HTML: с экранной и клавиатурной навигацией, полноэкранным и обзорным режимами, адаптивными интерактивными графиками, доступностью, печатью и реальной проверкой в браузере;
 - любое продолжение после выбора владельца остаётся этой же кампанией Mozaika: восстанови исходный `assignment.md` и selected checkpoint, заново выбери и вызови ролевые скиллы; запрещено подменять `html-presentation-studio` или шаблон карточек одноразовым `run_script`, даже если скрипт вручную подписан как Mozaika;
 - перед приёмкой каждого дашборда, страницы storytelling-карточек, выбранной карточки, презентации и финальной колоды карточек спикера независимый `mozaika-business-language-validator-agent` сначала защищает дословные пользовательские заголовки и пункты поручения, затем отдельно проверяет свободные заголовки и основной текст по `references/business-language-rules.md`; действует в режиме `pass by default`, отклоняет только бесспорные критические сбои — потерю защищённого текста, невосстановимый смысл, материальное искажение данных, грубую враждебность или служебную утечку — и для каждого возвращает одну минимальную формулировку без изменения фактов, цифр и оговорок; канцелярит, слабые заголовки, длину, повторы и просто неидеальный тон пропускает без замечаний; итог требует успешных `mozaika-business-language-audit/v1` для всех поверхностей сценария;
-- после успешной языковой проверки дашборда, презентации и финальных карточек спикера независимый `mozaika-visual-validator-agent` проверяет в реальном браузере все экраны и интерактивные состояния на широком, среднем и узком viewport: диаграммы и подписи не пересекаются и не выходят из контейнеров, peer-отступы не имеют сильных выбросов, заявленное центрирование геометрически точно; без трёх успешных `mozaika-visual-layout-audit/v1` для insight-сценария итог не принимается;
+- после успешной языковой проверки дашборда, презентации и финальных карточек спикера независимый `mozaika-visual-validator-agent` проверяет в реальном браузере все экраны и интерактивные состояния на широком, среднем и узком viewport: диаграммы и подписи не пересекаются и не выходят из контейнеров, peer-отступы не имеют сильных выбросов, заявленное центрирование геометрически точно; для дашборда дополнительно обязательны `filter_options_backed_by_data`, `filter_targets_recomputed`, `cross_filter_consistent` и `no_decorative_controls`; обработчик события, вызов `render()` или чистый console без смыслового изменения targets не проходит; без трёх успешных `mozaika-visual-layout-audit/v1` для insight-сценария итог не принимается;
 - итоговая HTML-презентация богата содержательными диаграммами, графиками, схемами и таблицами, которые раскрывают доказательства; переходы между страницами плавные и поддерживают ход истории, а при `prefers-reduced-motion` отключаются без потери смысла;
 - insight-презентация запускается только после selected checkpoint, отдельного storyline, passing narrative-integrity audit и deterministic `presentation_outline` gate; outline содержит уникальные slide ids и точное соответствие каждого пункта поручения существующим claim-bearing экранам;
 - после приёмки insight-презентации роль `mozaika-speaker-cards-agent` создаёт по обязательному шаблону брендбука ровно одну доказательную карточку-подсказку на каждый слайд; `speaker_story_cards` gate сверяет порядок, slide ids, заголовки, claims, текущие хеши презентации/outline/шаблона и только затем разрешает финальную доставку обоих HTML;
@@ -2990,13 +3000,15 @@ def _launch_fields(api: Any, scenario: str, body: Dict[str, Any]) -> Dict[str, A
         "source_hint": "\n".join(source_urls),
     }
     if scenario == "routine_report":
-        fields["instructions"] = _clean(body.get("instructions"))
+        fields["instructions"] = _clean(body.get("instructions"), max_chars=_MAX_PROMPT_CHARS)
         language_basis = fields["instructions"]
     elif scenario == "insight_deck":
-        fields["executive_brief"] = _clean(body.get("executive_brief"))
+        fields["executive_brief"] = _clean(body.get("executive_brief"), max_chars=_MAX_PROMPT_CHARS)
         language_basis = fields["executive_brief"]
     elif scenario == "weekly_autopilot":
-        fields["weekly_brief"] = _clean(body.get("weekly_brief"), required=True)
+        fields["weekly_brief"] = _clean(
+            body.get("weekly_brief"), required=True, max_chars=_MAX_PROMPT_CHARS
+        )
         language_basis = fields["weekly_brief"]
     else:
         raise ValueError("неподдерживаемый сценарий")

@@ -5,6 +5,7 @@
 - Scope gate
 - Claim gate
 - Frozen research and requirement map gates
+- Dashboard interaction-integrity gate
 - Owner-choice visual gate
 - Presentation and visual QA gate
 - Completion gate
@@ -35,6 +36,12 @@ Never claim an uncomputed trend, causal effect, confidence probability, future o
 For every insight run, validate `mozaika-research-brief/v1` immediately after assignment intake. Preserve named research titles, questions, slices, requested sections and constraints verbatim under `unicode-nfc-lf-v1`; internal ids never replace visible wording. Validate `mozaika-requirement-claim-map/v1` after claims are computed. It must cover every data-required item exactly once and resolve every claim/evidence id; constraints are checked separately as `applied_global`.
 
 Run `mozaika-narrative-integrity-audit/v1` independently on storytelling cards, selected card, storyline, final presentation, and final speaker-card deck. It blocks only structural meaning failures: missing frozen points, invalid claim/screen links, narrative drift, slide-to-cue mismatch, or exact/high-confidence repetition. It does not replace the deliberately permissive business-language audit or the visual-layout audit.
+
+## Dashboard interaction-integrity gate
+
+Before a dashboard is accepted or used by anomaly, storyline, presentation, or owner-choice stages, require complete `filter-data-coverage.json`, `interaction-qa.json`, dashboard design receipt and independent visual-layout audit. Every visible data-bound control must enumerate all offered options, backing data ref/key, aggregation and target ids. Test every option, a combination of two filters, empty state and reset; preserve input-slice and semantic target signatures.
+
+Fail the gate when an option lacks data, the selected value is not consumed by the computation, targets remain bound to one fixed slice, only labels/styles change, targets update inconsistently, or a control is presented as analytical while it only changes layout. An event listener, `render()` call, screenshot, clean console or self-authored `filters_functional=true` is insufficient. If the source cannot support the control, remove or visibly disable it and state the limitation; never manufacture interactivity.
 
 ## Owner-choice visual gate
 

@@ -1,7 +1,7 @@
 ---
 name: mozaika
 description: Orchestrate proactive but controlled multi-agent work in Ouroboros across configurable data, dashboard, storyline, and presentation roles using local skills, local task agents, or reviewed A2A peers. Classify when to act silently, act and notify, or pause for a material owner choice; enforce artifact and evidence contracts at every handoff. Use for recurring reports, executive insight decks, autonomous multi-step projects, or agent/skill orchestration. Do not use for greetings, simple questions, or one-step answers.
-version: 1.4.3
+version: 1.4.4
 type: extension
 runtime: python3
 entry: plugin.py
@@ -55,6 +55,8 @@ For every insight run, create and register `mozaika-research-brief/v1` immediate
 Use [contracts/research-brief.schema.json](contracts/research-brief.schema.json), [contracts/requirement-claim-map.schema.json](contracts/requirement-claim-map.schema.json), [contracts/narrative-integrity-audit.schema.json](contracts/narrative-integrity-audit.schema.json), and [contracts/owner-decision-checkpoint.schema.json](contracts/owner-decision-checkpoint.schema.json) as the canonical formats. Insight presentation outlines use frozen-requirement admission; routine outlines use fixed-template admission so the routine scenario remains compatible.
 
 Before accepting any owner-facing HTML, dispatch the independent business-language validator on its free headings and body text, preserving all owner-supplied titles and prompt points verbatim. After language remediation passes, read [references/visual-layout-validation.md](references/visual-layout-validation.md) and dispatch the independent visual validator role on the real browser surface.
+
+Before accepting a dashboard, prove data-backed interactivity rather than the presence of controls. Every visible filter, period selector, segment selector, search, sort, switch, tab, legend control, drill-down, or customization action must have declared targets and complete backing data for every offered state. The selected value must participate in filtering or recomputation of those targets; changing only a label, active style, caption, or control value while KPI, chart series, table rows, insights, and caveats stay bound to one fixed slice is a blocking fake-control failure. Remove or visibly disable a control when its data is unavailable. Require the dashboard producer and the independent visual validator to inspect the embedded data model and handler path, exercise every option plus a two-filter combination, and compare input-slice and semantic output signatures. A handler, screenshot, or self-reported `filters_functional=true` is not evidence. Do not dispatch storyline, anomaly analysis, or presentation from a dashboard that fails this check.
 
 ## Classify before interrupting the owner
 

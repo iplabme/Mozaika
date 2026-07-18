@@ -48,10 +48,20 @@
         "declared_centers_are_centered": {"const": true},
         "no_unintended_page_overflow": {"const": true},
         "interactive_states_inspected": {"const": true},
+        "filter_options_backed_by_data": {"const": true},
+        "filter_targets_recomputed": {"const": true},
+        "cross_filter_consistent": {"const": true},
+        "no_decorative_controls": {"const": true},
         "console_errors_absent": {"const": true}
       }
     },
     "issues": {"type": "array", "maxItems": 0},
     "status": {"const": "pass"}
-  }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"artifact_type": {"const": "dashboard"}}, "required": ["artifact_type"]},
+      "then": {"properties": {"checks": {"required": ["filter_options_backed_by_data", "filter_targets_recomputed", "cross_filter_consistent", "no_decorative_controls"]}}}
+    }
+  ]
 }

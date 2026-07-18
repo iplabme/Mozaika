@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Карточки спикера — От аналитика к создателю агентов</title>
+<style>
+:root {
+  --bg-primary: #1a1520;
+  --bg-card: rgba(38, 30, 48, 0.88);
+  --accent: #c93545;
+  --accent-light: #e85d6f;
+  --text-primary: #f5f0f8;
+  --text-secondary: #b8a8c8;
+  --border: rgba(255,255,255,0.08);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  padding: 40px 20px;
+}
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.header h1 {
+  font-size: 32px;
+  color: var(--accent-light);
+  margin-bottom: 8px;
+}
+.header p {
+  color: var(--text-secondary);
+  font-size: 16px;
+}
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.speaker-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  border-left: 4px solid var(--accent);
+}
+.card-num {
+  font-size: 14px;
+  color: var(--accent-light);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.card-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  line-height: 1.3;
+}
+.card-section {
+  margin-bottom: 14px;
+}
+.card-section h4 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--accent-light);
+  margin-bottom: 6px;
+}
+.card-section p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+.card-section ul {
+  list-style: none;
+  padding: 0;
+}
+.card-section li {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  padding-left: 16px;
+  position: relative;
+}
+.card-section li::before {
+  content: '▸';
+  color: var(--accent);
+  position: absolute;
+  left: 0;
+}
+@media (max-width: 768px) {
+  .cards-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Карточки спикера</h1>
+  <p>«От аналитика к создателю агентов» — 10 слайдов</p>
+</div>
+<div class="cards-grid">
+<div class="speaker-card">
+<div class="card-num">СЛАЙД 01</div>
+<div class="card-title">От аналитика к создателю агентов</div>
+<div class="card-section"><h4>Тезис слайда</h4>
+<p>ИИ превращает ML/DS-специалистов из потребителей аналитики в архитекторов автономных систем.</p>
+</div>
+<div class="card-section"><h4>Ключевые цифры</h4>
+<ul><li>Prompt engineering: 3.17% топ API-запросов</li><li>Agent architecture: 0.61% растущий запрос</li><li>AI-автономия Data Scientists: 3.1 из 4</li></ul>
+</div>
+<div class="card-section"><h4>Связь с аудиторией</h4>
+<p>Профиль ML/DS-специалиста проходит структурную трансформацию. Это влияет на найм, обучение и проектирование команд.</p>
+</div>
+</div>
+<div class="speaker-card">
+<div class="card-num">СЛАЙД 02</div>
+<div class="card-title">Контекст исследования</div>
+<div class="card-section"><h4>Что рассматриваем</h4>
+<p>6 обязательных разрезов: роли, работа с AI, артефакты, задачи, запросы, топ-ролей по доле использования.</p>
+</div>
+<div class="card-section"><h4>Период и охват</h4>
+<p>Апрель–май 2026, два источника данных: Claude Chat и 1P API.</p>
+</div>
+</div>
+<div class="speaker-card">
+<div class="card-num">СЛАЙД 03</div>
+<div class="card-title">Масштаб данных</div>
+<div class="card-section"><h4>Объём</h4>
+<ul><li>2.1 млн строк данных</li><li>1.6M — Claude Chat</li><li>492K — 1P API</li></ul>
+</div>
+<div class="card-section"><h4>Ролевая структура</h4>
+<p>23 ML/DS-роли из категории Computer and Mathematical, проанализированы по 51 метрике.</p>
+</div>
+<div class="card-section"><h4>Источники</h4>
+<p>aei_claude_ai_2026-06-26.csv + aei_1p_api_2026-06-26.csv, SHA-256 верифицированы.</p>
+</div>
+</div>
+<div class="speaker-card">
+<div class="card-num">СЛАЙД 04</div>
+<div class="card-title">Топ-10 ролей ML/DS по доле использования</div>
+<div class="card-section"><h4>Кто лидирует</h4>
+<ul><li>Computer User Support Specialists: 2.26%</li><li>Computer Systems Analysts: 2.01%</li><li>Data Warehousing Specialists: 1.71%</li><li>Computer Programmers: 1.68%</li><li>QA Analysts: 1.38%</li></ul>
+</div>
+<div class="card-section"><h4>Где Data Scientists</h4>
+<p>Data Scientists занимают 8-е место (0.67%) — не самая массовая, но самая автономная роль.</p>
+</div>
+<div class="card-section"><h4>Что говорить</h4>
+<p>Массовое использование смещено в сторону поддерживающих ролей, но качественный сдвиг происходит в специализированных.</p>
+</div>
+</div>
+<div class="speaker-card">
+<div class="card-num">СЛАЙД 05</div>
+<div class="card-title">Эволюция роли</div>
+<div class="card-section"><h4>Переход</h4>
+<p>Раздел между ролями-усилителями и ролями-автоматизаторами — ключевой сигнал трансформации.</p>
+</div>
+<div class="card-section"><h4>Что показать</h4>
+<p>Следующие слайды раскрывают, как именно меняется модель работы и что создают специалисты.</p>
+</div>
+</div>
+<div class="speaker-card">
+<div class="card-num">СЛАЙД 06</div>
+<div class="card-title">Два режима работы с AI</div>
+<div class="card-section"><h4>Data Scientists — усилители</h4>
+<p>Augmentation 52.6% — Data Scientists чаще используют AI для расширения своих возможностей, а не для замены рутины.</p>
+</div>
+<div class="card-section"><h4>Systems Analysts — автоматизаторы</h4>
+<p>Automation 83.7% — Computer Systems Analysts работают в режиме автоматизации: AI выполняет задачи за них.</p>
+</div>
+<div class="card-section"><h4>Вывод</h4>
+<p>Роли разделились: одни усиливают человеческий интеллект, другие автоматизируют повторяющиеся процессы.</p>
+</div>
+</div>
+<div class="speaker-card">
+<div class="card-num">СЛАЙД 07</div>
+<div class="card-title">Что создают Data Scientists</div>
+<div class="card-section"><h4>Топ-3 артефакта</h4>
+<ul><li>Визуализации: 26.5% — лидер среди всех ролей</li><li>Скрипты и код: 15.6%</li><li>Презентации: 15.3%</li></ul>
+</div>
+<div class="card-section"><h4>Что это значит</h4>
+<p>Data Scientists создают визуальные продукты и презентации чаще, чем код. Это сдвиг от программирования к коммуникации инсайтов.</p>
+</div>
+<div class="card-section"><h4>Сравнение</h4>
+<p>Software Developers создают code_fix_or_debug в 38.9% случаев. Data Scientists — лишь 1.9%. Профиль смещён.</p>
+</div>
+</div>
+<div class="speaker-card">
+<div class="card-num">СЛАЙД 08</div>
+<div class="card-title">Новые запросы в 1P API: от поиска к созданию агентов</div>
+<div class="card-section"><h4>Топ-5 запросов</h4>
+<ul><li>Prompt engineering: 3.17%</li><li>Workflow state routing: 3.05%</li><li>Structured data output: 2.31%</li><li>Agent architecture: 0.61%</li><li>API debugging: 0.58%</li></ul>
+</div>
+<div class="card-section"><h4>Ключевой сигнал</h4>
+<p>Prompt engineering и Agent architecture в топе API-запросов — специалисты проектируют промпты и архитектуру агентов, а не просто ищут информацию.</p>
+</div>
+<div class="card-section"><h4>Трансформация</h4>
+<p>Запросы смещаются от поиска информации к проектированию автономных систем. Это — практический след эволюции роли.</p>
+</div>
+</div>
+<div class="speaker-card">
+<div class="card-num">СЛАЙД 09</div>
+<div class="card-title">Автономия и новые компетенции</div>
+<div class="card-section"><h4>AI-автономия</h4>
+<p>Data Scientists: 3.1 из 4 — наивысший показатель среди ML/DS-ролей. Это значит, что AI берёт на себя значительную часть работы.</p>
+</div>
+<div class="card-section"><h4>Новые компетенции</h4>
+<ul><li>Prompt engineering (3.17%)</li><li>Agent architecture (0.61%)</li><li>Structured data output (2.31%)</li></ul>
+</div>
+<div class="card-section"><h4>Традиционные задачи</h4>
+<p>Поиск информации и программирование остаются, но дополняются проектированием агентов и структурированным выводом данных.</p>
+</div>
+</div>
+<div class="speaker-card">
+<div class="card-num">СЛАЙД 10</div>
+<div class="card-title">Вывод: от аналитика к архитектору</div>
+<div class="card-section"><h4>Главная мысль</h4>
+<p>Профиль ML/DS-специалиста эволюционирует от потребителя аналитики к создателю автономных систем.</p>
+</div>
+<div class="card-section"><h4>Три доказательства</h4>
+<ul><li>Наивысшая AI-автономия (3.1/4) среди всех ролей</li><li>Augmentation > Automation (52.6% vs 47.4%)</li><li>Prompt engineering и Agent architecture в топе API-запросов</li></ul>
+</div>
+<div class="card-section"><h4>Практическое следствие</h4>
+<p>Командам нужны специалисты, способные проектировать агентов, а не только анализировать данные. Это меняет требования к найму и развитию.</p>
+</div>
+<div class="card-section"><h4>Источники</h4>
+<p>Claude Chat (1.6M строк) + 1P API (492K строк), апрель–май 2026. 23 ML/DS-роли, 51 метрика, 6 разрезов.</p>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -123,6 +123,9 @@ Required responsibilities:
 - choose a reviewed HTML visualization capability and preserve a real-browser QA surface.
 - reread the assignment and give every owner-requested point a visible result, interpretation and evidence-bearing dashboard location; a filter alone is not coverage.
 - when the owner named narrative alternatives, use those alternatives as the strategy-card basis instead of inventing substitutes.
+- bind every visible data control to complete source rows or reproducible aggregate slices and named targets; never offer values that exist only as labels.
+- prove that the selected value participates in the filtering/recomputation path and that KPI, chart, table, insight, signal and caveat targets update from one consistent filtered state.
+- remove or visibly disable unavailable controls instead of shipping decorative filters, selectors, switches, tabs, legends or drill-downs.
 
 Required `mozaika-dashboard-package/v1` outputs:
 
@@ -130,6 +133,8 @@ Required `mozaika-dashboard-package/v1` outputs:
 - rendered dashboard reference;
 - `chart-catalog.json`;
 - `claim-chart-map.json`;
+- `filter-data-coverage.json` mapping every data-bound control and option to backing data, targets and aggregation;
+- `interaction-qa.json` recording tested options/combinations, input-slice signatures, semantic target signatures and reset evidence;
 - internal `owner-choice.json` when owner choice is required, plus owner-visible HTML dashboard and `storytelling-cards.html` surfaced before the question, and `selected-storytelling-card.html` containing only the selected option before storyline dispatch;
 - one owner-visible self-contained `storytelling-cards.html` containing every option at a stable anchor;
 - a real-browser QA capture of that HTML choice surface.
@@ -271,7 +276,7 @@ The validator is independent of the producing role. Read
 `visual-layout-validation.md`, choose the strongest ready browser/layout-audit
 skill available for that invocation, and inspect the real HTML at wide, medium
 and narrow viewports. Check every presentation screen and required dashboard
-interaction. Measure unintended overlaps, chart bounds, peer spacing outliers,
+interaction. For dashboards, inspect the payload and event path as well as the rendered DOM: enumerate all data-bound controls, verify backing data for every option, prove the selected value reaches target computation, and compare filtered input and semantic output signatures. A control that changes only its label/style or redraws one fixed slice is a blocking failure even when it has an event handler and no console error. Measure unintended overlaps, chart bounds, peer spacing outliers,
 declared center offsets and page overflow after rendering and transitions. A
 failed audit is a typed handoff back to the producer; only a new immutable
 revision may be rechecked.
@@ -311,7 +316,7 @@ Enforce these gates in the parent orchestrator:
 2. **Scope gate:** all requested collection members are inventoried and analyzed, or scope reduction is owner-approved and explicit.
 3. **Artifact gate:** every user input and stage output has an immutable durable append-only reference; deletion is disabled.
 4. **Data/claim gate:** lineage, quality report, reversible cleaning evidence, and arithmetic-valid claims exist.
-5. **Dashboard gate:** every major visual maps to a validated claim and source evidence.
+5. **Dashboard gate:** every major visual maps to a validated claim and source evidence; every data-bound control has complete backing data and verified targets, all options and a two-filter combination are exercised, and no decorative or label-only interactivity remains.
 6. **Owner-choice gate:** insight strategy is explicitly selected from two or three rendered visual previews when alternatives change executive meaning.
 7. **Storyline gate:** governing thought, ordered claim ids, evidence map, language, and screen intents are coherent before presentation rendering.
 8. **Presentation gate:** outline matches the approved storyline and the rich HTML passes interaction, responsive, accessibility, visual, language, and numeric QA.

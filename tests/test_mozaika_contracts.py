@@ -21,6 +21,27 @@ CONTRACTS = SKILL / "contracts"
 
 
 class MozaikaContractTests(unittest.TestCase):
+    def test_widget_prompt_limit_is_8000_in_browser_and_backend(self):
+        plugin_path = SKILL / "plugin.py"
+        spec = importlib.util.spec_from_file_location("mozaika_plugin_prompt_limit", plugin_path)
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        self.assertEqual(module._MAX_PROMPT_CHARS, 8000)
+        self.assertEqual(
+            module._clean("я" * 8000, max_chars=module._MAX_PROMPT_CHARS),
+            "я" * 8000,
+        )
+        with self.assertRaisesRegex(ValueError, "8000"):
+            module._clean("я" * 8001, max_chars=module._MAX_PROMPT_CHARS)
+
+        for widget_name in ("insight-widget.js", "routine-widget.js"):
+            widget = (SKILL / widget_name).read_text(encoding="utf-8")
+            self.assertIn("const MAX_PROMPT_CHARS = 8000;", widget)
+            self.assertIn('maxlength="${MAX_PROMPT_CHARS}"', widget)
+
     def test_every_contract_is_valid_draft_2020_12_schema(self):
         for path in sorted(CONTRACTS.glob("*.schema.json")):
             with self.subTest(path=path.name):
@@ -348,6 +369,21 @@ class MozaikaContractTests(unittest.TestCase):
         self.assertIn("assertSeparatedSurfaces", renderer)
         self.assertIn("dashboard-html-without-storytelling-cards/v1", renderer)
 
+    def test_dashboard_audits_require_data_backed_interactivity(self):
+        interaction_checks = {
+            "filter_options_backed_by_data",
+            "filter_targets_recomputed",
+            "cross_filter_consistent",
+            "no_decorative_controls",
+        }
+        design_schema = json.loads((CONTRACTS / "design-receipt.schema.json").read_text(encoding="utf-8"))
+        design_dashboard_required = set(design_schema["allOf"][1]["then"]["properties"]["checks"]["required"])
+        self.assertTrue(interaction_checks <= design_dashboard_required)
+
+        layout_schema = json.loads((CONTRACTS / "visual-layout-audit.schema.json").read_text(encoding="utf-8"))
+        layout_dashboard_required = set(layout_schema["allOf"][0]["then"]["properties"]["checks"]["required"])
+        self.assertEqual(interaction_checks, layout_dashboard_required)
+
     def test_dashboard_renderer_never_embeds_storytelling_cards(self):
         node = shutil.which("node")
         if not node:
@@ -649,7 +685,7 @@ class MozaikaContractTests(unittest.TestCase):
                     "stage_id": "dashboard", "artifact_type": "dashboard", "artifact_id": "dashboard",
                     "brandbook": {"authority": "owner_brandbook", "manifest_path": "data/brandbook/mozaika/manifest.json", "manifest_sha256": "d" * 64, "tokens_path": "data/brandbook/mozaika/tokens.css", "reference_ids": ["anthropic-economic-index-dashboard"]},
                     "instructions_passed": True,
-                    "checks": {"warm_canvas": True, "typography_hierarchy": True, "artifact_pattern": True, "semantic_palette": True, "source_proximity": True, "no_forbidden_default_theme": True, "service_metadata_hidden": True, "dashboard_excludes_storytelling_cards": True, "aligned_grid": True, "charts_render_without_errors": True, "tables_readable": True, "filters_functional": True, "filter_reset_works": True, "table_search_functional": True, "table_sort_functional": True, "customization_controls_functional": True, "customization_reset_works": True, "responsive_no_overflow": True, "empty_states_clear": True, "console_errors_absent": True, "browser_verified": True},
+                    "checks": {"warm_canvas": True, "typography_hierarchy": True, "artifact_pattern": True, "semantic_palette": True, "source_proximity": True, "no_forbidden_default_theme": True, "service_metadata_hidden": True, "dashboard_excludes_storytelling_cards": True, "aligned_grid": True, "charts_render_without_errors": True, "tables_readable": True, "filters_functional": True, "filter_options_backed_by_data": True, "filter_targets_recomputed": True, "cross_filter_consistent": True, "no_decorative_controls": True, "filter_reset_works": True, "table_search_functional": True, "table_sort_functional": True, "customization_controls_functional": True, "customization_reset_works": True, "responsive_no_overflow": True, "empty_states_clear": True, "console_errors_absent": True, "browser_verified": True},
                     "deviations": [], "owner_override_id": None, "status": "pass",
                 },
                 {
@@ -697,7 +733,7 @@ class MozaikaContractTests(unittest.TestCase):
                         {"width": 1024, "height": 768, "screenshot_artifact_id": "dashboard-medium", "overlap_count": 0, "overflow_count": 0, "spacing_outlier_count": 0, "max_center_offset_px": 1},
                         {"width": 390, "height": 844, "screenshot_artifact_id": "dashboard-narrow", "overlap_count": 0, "overflow_count": 0, "spacing_outlier_count": 0, "max_center_offset_px": 1.5}
                     ],
-                    "checks": {"all_screens_inspected": True, "no_unintended_overlaps": True, "charts_within_bounds": True, "consistent_peer_spacing": True, "declared_centers_are_centered": True, "no_unintended_page_overflow": True, "interactive_states_inspected": True, "console_errors_absent": True},
+                    "checks": {"all_screens_inspected": True, "no_unintended_overlaps": True, "charts_within_bounds": True, "consistent_peer_spacing": True, "declared_centers_are_centered": True, "no_unintended_page_overflow": True, "interactive_states_inspected": True, "filter_options_backed_by_data": True, "filter_targets_recomputed": True, "cross_filter_consistent": True, "no_decorative_controls": True, "console_errors_absent": True},
                     "issues": [], "status": "pass"
                 },
                 {
@@ -726,7 +762,12 @@ class MozaikaContractTests(unittest.TestCase):
             },
             "unresolved": [],
         }
-        Draft202012Validator(completion, registry=registry).validate(payload)
+        validator = Draft202012Validator(completion, registry=registry)
+        validator.validate(payload)
+
+        del payload["layout_audits"][0]["checks"]["no_decorative_controls"]
+        errors = list(validator.iter_errors(payload))
+        self.assertTrue(errors, "dashboard audit without no_decorative_controls must fail")
 
 
 if __name__ == "__main__":

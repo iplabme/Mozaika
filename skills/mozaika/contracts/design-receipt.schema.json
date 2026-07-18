@@ -41,6 +41,10 @@
         "charts_render_without_errors": {"const": true},
         "tables_readable": {"const": true},
         "filters_functional": {"const": true},
+        "filter_options_backed_by_data": {"const": true},
+        "filter_targets_recomputed": {"const": true},
+        "cross_filter_consistent": {"const": true},
+        "no_decorative_controls": {"const": true},
         "filter_reset_works": {"const": true},
         "table_search_functional": {"const": true},
         "table_sort_functional": {"const": true},
@@ -69,7 +73,7 @@
     },
     {
       "if": {"properties": {"artifact_type": {"const": "dashboard"}}, "required": ["artifact_type"]},
-      "then": {"properties": {"checks": {"required": ["dashboard_excludes_storytelling_cards", "aligned_grid", "charts_render_without_errors", "tables_readable", "filters_functional", "filter_reset_works", "table_search_functional", "table_sort_functional", "customization_controls_functional", "customization_reset_works", "responsive_no_overflow", "empty_states_clear", "console_errors_absent"]}}}
+      "then": {"properties": {"checks": {"required": ["dashboard_excludes_storytelling_cards", "aligned_grid", "charts_render_without_errors", "tables_readable", "filters_functional", "filter_options_backed_by_data", "filter_targets_recomputed", "cross_filter_consistent", "no_decorative_controls", "filter_reset_works", "table_search_functional", "table_sort_functional", "customization_controls_functional", "customization_reset_works", "responsive_no_overflow", "empty_states_clear", "console_errors_absent"]}}}
     },
     {
       "if": {"properties": {"artifact_type": {"enum": ["storytelling_cards", "selected_storytelling_card", "speaker_story_cards"]}}, "required": ["artifact_type"]},

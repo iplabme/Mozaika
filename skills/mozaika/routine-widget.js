@@ -16,6 +16,7 @@
   };
   const MAX_SOURCES = 50;
   const MAX_FILES = 500;
+  const MAX_PROMPT_CHARS = 8000;
   const VISIBLE_SOURCES = 6;
   const root = document.getElementById('root');
   const sources = [];
@@ -100,7 +101,7 @@
       <div id="source-list" class="sources"></div>
       <div class="task-row">
         <div class="task-field">
-          <label>${CONFIG.taskLabel}<textarea id="task">${CONFIG.defaultTask}</textarea></label>
+          <label>${CONFIG.taskLabel}<textarea id="task" maxlength="${MAX_PROMPT_CHARS}">${CONFIG.defaultTask}</textarea></label>
           <div class="presets-wrap">
             <button id="task-presets" class="presets-pill" type="button" aria-haspopup="menu" aria-expanded="false" disabled>варианты задания</button>
             <div id="task-presets-menu" class="presets-menu" role="menu" hidden></div>
