@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mozaika.local/contracts/handoff-envelope.schema.json",
+  "title": "Mozaika handoff envelope",
+  "oneOf": [
+    {"$ref": "#/$defs/request"},
+    {"$ref": "#/$defs/result"}
+  ],
+  "$defs": {
+    "artifact_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "uri", "sha256", "media_type", "schema", "created_at", "source_task_id", "source_stage_id", "preservation"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "uri": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "media_type": {"type": "string", "minLength": 1},
+        "schema": {"type": "string", "minLength": 1},
+        "size_bytes": {"type": "integer", "minimum": 0},
+        "created_at": {"type": "string", "format": "date-time"},
+        "source_task_id": {"type": "string", "minLength": 1},
+        "source_stage_id": {"type": "string", "minLength": 1},
+        "preservation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "preserved", "immutable", "durable", "allow_delete"],
+          "properties": {
+            "mode": {"const": "append_only"},
+            "preserved": {"const": true},
+            "immutable": {"const": true},
+            "durable": {"const": true},
+            "allow_delete": {"const": false}
+          }
+        }
+      }
+    },
+    "intervention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tag", "class", "summary", "reason", "reversible"],
+      "properties": {
+        "tag": {"enum": ["routine-formatting", "known-source-resolution", "approved-brand-refresh", "reversible-cleaning", "likely-outlier-exclusion", "known-schema-repair", "narrative-strategy", "insight-grouping", "meaning-changing-data-conflict", "new-authority"]},
+        "class": {"enum": ["silent", "notify", "owner_choice"]},
+        "summary": {"type": "string", "minLength": 1},
+        "reason": {"type": "string", "minLength": 1},
+        "reversible": {"type": "boolean"},
+        "artifact_refs": {"type": "array", "items": {"$ref": "#/$defs/artifact_ref"}}
+      },
+      "allOf": [
+        {
+          "oneOf": [
+            {"properties": {"tag": {"const": "routine-formatting"}, "class": {"const": "silent"}}},
+            {"properties": {"tag": {"const": "known-source-resolution"}, "class": {"const": "silent"}}},
+            {"properties": {"tag": {"const": "approved-brand-refresh"}, "class": {"const": "silent"}}},
+            {"properties": {"tag": {"const": "reversible-cleaning"}, "class": {"const": "notify"}}},
+            {"properties": {"tag": {"const": "likely-outlier-exclusion"}, "class": {"const": "notify"}}},
+            {"properties": {"tag": {"const": "known-schema-repair"}, "class": {"const": "notify"}}},
+            {"properties": {"tag": {"const": "narrative-strategy"}, "class": {"const": "owner_choice"}}},
+            {"properties": {"tag": {"const": "insight-grouping"}, "class": {"const": "owner_choice"}}},
+            {"properties": {"tag": {"const": "meaning-changing-data-conflict"}, "class": {"const": "owner_choice"}}},
+            {"properties": {"tag": {"const": "new-authority"}, "class": {"const": "owner_choice"}}}
+          ]
+        }
+      ]
+    },
+    "engine_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "skill_name", "skill_version", "skill_type", "review_status", "payload_sha256", "mode", "entry", "exit_status", "output_artifact_ids", "python_used"],
+      "properties": {
+        "role": {"enum": ["data", "dashboard", "storyline", "presentation", "business_language_validator", "visual_validator"]},
+        "skill_name": {"type": "string", "minLength": 1},
+        "skill_version": {"type": "string", "minLength": 1},
+        "skill_type": {"enum": ["instruction", "script"]},
+        "review_status": {"const": "fresh"},
+        "payload_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "mode": {"enum": ["instruction_application", "skill_exec"]},
+        "entry": {"type": "string", "minLength": 1},
+        "exit_status": {"enum": ["applied", "succeeded"]},
+        "output_artifact_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "python_used": {"type": "boolean"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"skill_type": {"const": "script"}}},
+          "then": {"properties": {"mode": {"const": "skill_exec"}, "exit_status": {"const": "succeeded"}}},
+          "else": {"properties": {"mode": {"const": "instruction_application"}, "entry": {"const": "SKILL.md"}, "exit_status": {"const": "applied"}}}
+        }
+      ]
+    },
+    "design_system": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authority", "instruction", "manifest", "tokens", "references", "owner_override_id"],
+      "properties": {
+        "authority": {"const": "owner_brandbook"},
+        "instruction": {"const": "Брендбук Mozaika — источник правды для дизайна. Реализуй именно его композицию, токены и паттерны для данного типа артефакта. Встроенные темы renderer запрещены, если владелец явно не переопределил брендбук."},
+        "manifest": {"$ref": "#/$defs/artifact_ref"},
+        "tokens": {"$ref": "#/$defs/artifact_ref"},
+        "references": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/artifact_ref"}},
+        "owner_override_id": {"type": ["string", "null"], "minLength": 1}
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract_version", "message_type", "run_id", "stage_id", "agent_id", "role", "created_at", "output_language", "objective", "inputs", "constraints", "decision_policy", "expected_outputs"],
+      "properties": {
+        "contract_version": {"const": "1.2"},
+        "message_type": {"const": "request"},
+        "run_id": {"type": "string", "minLength": 1},
+        "stage_id": {"type": "string", "minLength": 1},
+        "agent_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+        "role": {"enum": ["data", "dashboard", "storyline", "presentation", "business_language_validator", "visual_validator"]},
+        "created_at": {"type": "string", "format": "date-time"},
+        "output_language": {"type": "string", "minLength": 2},
+        "objective": {"type": "string", "minLength": 1},
+        "inputs": {"type": "array", "items": {"$ref": "#/$defs/artifact_ref"}},
+        "constraints": {"type": "object"},
+        "decision_policy": {"type": "object"},
+        "expected_outputs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "fixed_storyline_contract_version": {"type": "string", "minLength": 1},
+        "context": {"type": "object"},
+        "design_system": {"$ref": "#/$defs/design_system"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"role": {"enum": ["dashboard", "storyline", "presentation", "visual_validator"]}}},
+          "then": {"required": ["design_system"]}
+        }
+      ]
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract_version", "message_type", "run_id", "stage_id", "agent_id", "role", "started_at", "completed_at", "duration_ms", "output_language", "status", "outputs", "evidence", "engine_receipts", "interventions", "warnings", "unresolved_questions"],
+      "properties": {
+        "contract_version": {"const": "1.2"},
+        "message_type": {"const": "result"},
+        "run_id": {"type": "string", "minLength": 1},
+        "stage_id": {"type": "string", "minLength": 1},
+        "agent_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+        "role": {"enum": ["data", "dashboard", "storyline", "presentation", "business_language_validator", "visual_validator"]},
+        "started_at": {"type": "string", "format": "date-time"},
+        "completed_at": {"type": "string", "format": "date-time"},
+        "duration_ms": {"type": "integer", "minimum": 0},
+        "output_language": {"type": "string", "minLength": 2},
+        "status": {"enum": ["solved", "best_effort", "blocked_with_evidence"]},
+        "outputs": {"type": "array", "items": {"$ref": "#/$defs/artifact_ref"}},
+        "evidence": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "engine_receipts": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/engine_receipt"}},
+        "interventions": {"type": "array", "items": {"$ref": "#/$defs/intervention"}},
+        "warnings": {"type": "array", "items": {"type": "string"}},
+        "unresolved_questions": {"type": "array", "items": {"type": "string"}},
+        "metrics": {"type": "object"},
+        "design_receipts": {"type": "array", "items": {"$ref": "https://mozaika.local/contracts/design-receipt-v1.schema.json"}}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"role": {"enum": ["dashboard", "presentation"]}}},
+          "then": {"required": ["design_receipts"], "properties": {"design_receipts": {"minItems": 1}}}
+        }
+      ]
+    }
+  }
+}

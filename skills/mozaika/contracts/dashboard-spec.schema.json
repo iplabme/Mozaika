@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mozaika.local/contracts/dashboard-spec.schema.json",
+  "title": "mozaika-dashboard-spec/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "surface_policy", "title", "output_language", "design_system", "research_title_verbatim", "research_questions", "kpis", "filters", "charts", "tables", "customization", "insights", "caveats", "storytelling_cards", "sources"],
+  "properties": {
+    "contract_version": {"const": "mozaika-dashboard-spec/v1"},
+    "surface_policy": {"const": "separate-dashboard-and-storytelling-cards"},
+    "title": {"type": "string", "minLength": 1, "maxLength": 180},
+    "subtitle": {"type": "string", "minLength": 1, "maxLength": 300},
+    "output_language": {"type": "string", "minLength": 2, "maxLength": 12},
+    "design_system": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authority", "manifest_path", "manifest_sha256", "tokens_path", "reference_ids", "instruction"],
+      "properties": {
+        "authority": {"const": "owner_brandbook"},
+        "manifest_path": {"const": "data/brandbook/mozaika/manifest.json"},
+        "manifest_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "tokens_path": {"const": "data/brandbook/mozaika/tokens.css"},
+        "reference_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "instruction": {"const": "Брендбук Mozaika — источник правды для дизайна. Реализуй именно его композицию, токены и паттерны для данного типа артефакта. Встроенные темы renderer запрещены, если владелец явно не переопределил брендбук."}
+      }
+    },
+    "generated_at": {"type": "string", "format": "date-time"},
+    "research_title_verbatim": {"type": ["string", "null"], "minLength": 1, "maxLength": 180},
+    "research_questions": {"type": "array", "maxItems": 30, "items": {"$ref": "#/$defs/research_question"}},
+    "owner_question": {"type": "string", "minLength": 1, "maxLength": 300},
+    "recommended_option_id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"},
+    "kpis": {"type": "array", "maxItems": 12, "items": {"$ref": "#/$defs/kpi"}},
+    "filters": {"type": "array", "minItems": 1, "maxItems": 12, "items": {"$ref": "#/$defs/filter"}},
+    "charts": {"type": "array", "minItems": 1, "maxItems": 16, "items": {"$ref": "#/$defs/chart"}},
+    "tables": {"type": "array", "minItems": 1, "maxItems": 12, "items": {"$ref": "#/$defs/table"}},
+    "customization": {"$ref": "#/$defs/customization"},
+    "insights": {"type": "array", "maxItems": 12, "items": {"$ref": "#/$defs/insight"}},
+    "caveats": {"type": "array", "maxItems": 30, "items": {"type": "string", "minLength": 1}},
+    "storytelling_cards": {
+      "oneOf": [
+        {"type": "array", "maxItems": 0},
+        {"type": "array", "minItems": 2, "maxItems": 3, "items": {"$ref": "#/$defs/storytelling_card"}}
+      ]
+    },
+    "sources": {"type": "array", "minItems": 1, "maxItems": 100, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"storytelling_cards": {"minItems": 2}}},
+      "then": {"required": ["owner_question", "recommended_option_id"]}
+    }
+  ],
+  "$defs": {
+    "claim_ids": {"type": "array", "minItems": 1, "maxItems": 60, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "status": {"enum": ["neutral", "good", "warning", "critical"]},
+    "research_question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text_verbatim", "finding", "status", "claim_ids"],
+      "properties": {
+        "text_verbatim": {"type": "string", "minLength": 1, "maxLength": 500},
+        "finding": {"type": "string", "minLength": 1, "maxLength": 1000},
+        "status": {"enum": ["answered", "partial", "unanswered"]},
+        "claim_ids": {"$ref": "#/$defs/claim_ids"}
+      }
+    },
+    "filter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "field", "all_label"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"},
+        "label": {"type": "string", "minLength": 1, "maxLength": 100},
+        "field": {"type": "string", "minLength": 1, "maxLength": 128},
+        "all_label": {"type": "string", "minLength": 1, "maxLength": 80}
+      }
+    },
+    "kpi": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "value", "status", "claim_ids"],
+      "properties": {
+        "label": {"type": "string", "minLength": 1, "maxLength": 100},
+        "value": {"type": ["string", "number"], "minLength": 1},
+        "delta": {"type": ["string", "number"]},
+        "status": {"$ref": "#/$defs/status"},
+        "claim_ids": {"$ref": "#/$defs/claim_ids"}
+      }
+    },
+    "chart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "title", "data", "encode", "claim_ids"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"},
+        "type": {"enum": ["interval", "line", "point", "area", "pie"]},
+        "title": {"type": "string", "minLength": 1, "maxLength": 180},
+        "subtitle": {"type": "string", "minLength": 1, "maxLength": 260},
+        "data": {"type": "array", "minItems": 1, "maxItems": 100000, "items": {"type": "object"}},
+        "encode": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["x", "y"],
+          "properties": {
+            "x": {"type": "string", "minLength": 1},
+            "y": {"type": "string", "minLength": 1},
+            "color": {"type": "string", "minLength": 1},
+            "size": {"type": "string", "minLength": 1},
+            "shape": {"type": "string", "minLength": 1}
+          }
+        },
+        "claim_ids": {"$ref": "#/$defs/claim_ids"},
+        "height": {"type": "integer", "minimum": 240, "maximum": 700}
+      }
+    },
+    "table": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "columns", "rows", "searchable", "page_size", "claim_ids"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"},
+        "title": {"type": "string", "minLength": 1, "maxLength": 180},
+        "subtitle": {"type": "string", "minLength": 1, "maxLength": 260},
+        "columns": {"type": "array", "minItems": 2, "maxItems": 20, "items": {"$ref": "#/$defs/table_column"}},
+        "rows": {"type": "array", "minItems": 1, "maxItems": 100000, "items": {"type": "object"}},
+        "searchable": {"const": true},
+        "page_size": {"type": "integer", "minimum": 5, "maximum": 100},
+        "claim_ids": {"$ref": "#/$defs/claim_ids"}
+      }
+    },
+    "table_column": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "label", "format", "sortable"],
+      "properties": {
+        "key": {"type": "string", "minLength": 1, "maxLength": 128},
+        "label": {"type": "string", "minLength": 1, "maxLength": 100},
+        "format": {"enum": ["text", "number", "percent", "currency", "date"]},
+        "sortable": {"type": "boolean"},
+        "align": {"enum": ["left", "right", "center"]},
+        "currency": {"type": "string", "pattern": "^[A-Z]{3}$"}
+      }
+    },
+    "customization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allow_section_visibility", "allow_density", "allow_table_search", "allow_reset"],
+      "properties": {
+        "allow_section_visibility": {"const": true},
+        "allow_density": {"const": true},
+        "allow_table_search": {"const": true},
+        "allow_reset": {"const": true}
+      }
+    },
+    "insight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "body", "severity", "claim_ids"],
+      "properties": {
+        "title": {"type": "string", "minLength": 1, "maxLength": 160},
+        "body": {"type": "string", "minLength": 1, "maxLength": 600},
+        "severity": {"$ref": "#/$defs/status"},
+        "claim_ids": {"$ref": "#/$defs/claim_ids"}
+      }
+    },
+    "storytelling_card": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["option_id", "headline", "core_message", "why_it_matters", "story_beats", "executive_takeaway", "claim_ids"],
+      "properties": {
+        "option_id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]*$", "maxLength": 64},
+        "headline": {"type": "string", "minLength": 1, "maxLength": 180},
+        "core_message": {"type": "string", "minLength": 1, "maxLength": 500},
+        "why_it_matters": {"type": "string", "minLength": 1, "maxLength": 500},
+        "story_beats": {"type": "array", "minItems": 3, "maxItems": 5, "items": {"$ref": "#/$defs/story_beat"}},
+        "executive_takeaway": {"type": "string", "minLength": 1, "maxLength": 500},
+        "claim_ids": {"$ref": "#/$defs/claim_ids"},
+        "requirements_coverage": {"type": "array", "maxItems": 30, "items": {"$ref": "#/$defs/requirement_coverage"}}
+      }
+    },
+    "requirement_coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text_verbatim", "status", "framing", "beat_sequences"],
+      "properties": {
+        "text_verbatim": {"type": "string", "minLength": 1, "maxLength": 500},
+        "status": {"enum": ["covered", "partial", "unanswered"]},
+        "framing": {"type": "string", "minLength": 3, "maxLength": 500},
+        "beat_sequences": {"type": "array", "maxItems": 5, "uniqueItems": true, "items": {"type": "integer", "minimum": 1, "maximum": 5}}
+      }
+    },
+    "story_beat": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sequence", "title", "message"],
+      "properties": {
+        "sequence": {"type": "integer", "minimum": 1, "maximum": 5},
+        "title": {"type": "string", "minLength": 1, "maxLength": 120},
+        "message": {"type": "string", "minLength": 1, "maxLength": 400}
+      }
+    }
+  }
+}

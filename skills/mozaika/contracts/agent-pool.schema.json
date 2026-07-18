@@ -1,0 +1,259 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mozaika.local/contracts/agent-pool.schema.json",
+  "title": "Mozaika adaptive agent pool",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "pool_name", "state", "pipelines", "runtime_compatibility", "artifact_policy", "design_system", "skill_selection", "skill_pools", "agents", "a2a", "decision_policy", "learning"],
+  "properties": {
+    "contract_version": {"const": "1.3"},
+    "pool_name": {"type": "string", "minLength": 1},
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "workpad_key", "file_overrides_allowed"],
+      "properties": {
+        "source": {"const": "project_workpad"},
+        "workpad_key": {"const": "mozaika-pool/v1"},
+        "file_overrides_allowed": {"const": false}
+      }
+    },
+    "pipelines": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["routine_report", "insight_deck", "weekly_autopilot"],
+      "properties": {
+        "routine_report": {"const": ["data", "dashboard", "presentation", "pptx"]},
+        "insight_deck": {"const": ["data", "dashboard", "storyline", "presentation", "speaker_cards", "pptx"]},
+        "weekly_autopilot": {"const": ["data", "dashboard", "anomaly_analysis", "presentation", "pptx"]}
+      }
+    },
+    "runtime_compatibility": {"$ref": "#/$defs/runtime_compatibility"},
+    "artifact_policy": {"$ref": "#/$defs/artifact_policy"},
+    "design_system": {"$ref": "#/$defs/design_system"},
+    "skill_selection": {"$ref": "#/$defs/skill_selection"},
+    "skill_pools": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adaptive-full"],
+      "properties": {"adaptive-full": {"$ref": "#/$defs/skill_pool"}}
+    },
+    "agents": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["data", "dashboard", "anomaly_analysis", "storyline", "presentation", "speaker_cards", "pptx", "business_language_validator", "visual_validator"],
+      "properties": {
+        "data": {"$ref": "#/$defs/agent"},
+        "dashboard": {"$ref": "#/$defs/agent"},
+        "anomaly_analysis": {"$ref": "#/$defs/agent"},
+        "storyline": {"$ref": "#/$defs/agent"},
+        "presentation": {"$ref": "#/$defs/agent"},
+        "speaker_cards": {"$ref": "#/$defs/agent"},
+        "pptx": {"$ref": "#/$defs/agent"},
+        "business_language_validator": {"$ref": "#/$defs/agent"},
+        "visual_validator": {"$ref": "#/$defs/agent"}
+      }
+    },
+    "a2a": {"$ref": "#/$defs/a2a"},
+    "decision_policy": {"$ref": "#/$defs/decision_policy"},
+    "learning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["knowledge_key_prefix", "contract", "reuse_requires_validation", "owner_domain_profile_key_prefix", "owner_domain_profile_contract", "profile_updates_require_evidence", "sensitive_inference_allowed", "training_mode"],
+      "properties": {
+        "knowledge_key_prefix": {"const": "mozaika-routine-"},
+        "contract": {"const": "mozaika-routine-learning/v1"},
+        "reuse_requires_validation": {"const": true},
+        "owner_domain_profile_key_prefix": {"const": "mozaika-owner-domain-"},
+        "owner_domain_profile_contract": {"const": "mozaika-owner-domain-profile/v1"},
+        "profile_updates_require_evidence": {"const": true},
+        "sensitive_inference_allowed": {"const": false},
+        "training_mode": {"const": "profile_memory_not_model_weights"}
+      }
+    }
+  },
+  "$defs": {
+    "design_system": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authority", "project_path", "runtime_path", "manifest_path", "tokens_path", "references_path", "enforcement", "renderer_defaults_allowed", "owner_override_required", "receipt_contract"],
+      "properties": {
+        "authority": {"const": "owner_brandbook"},
+        "project_path": {"const": "brandbook/BRANDBOOK.md"},
+        "runtime_path": {"const": "data/brandbook/mozaika/BRANDBOOK.md"},
+        "manifest_path": {"const": "data/brandbook/mozaika/manifest.json"},
+        "tokens_path": {"const": "data/brandbook/mozaika/tokens.css"},
+        "references_path": {"const": "data/brandbook/mozaika/references"},
+        "enforcement": {"const": "required_for_generation"},
+        "renderer_defaults_allowed": {"const": false},
+        "owner_override_required": {"const": true},
+        "receipt_contract": {"const": "mozaika-design-receipt/v1"}
+      }
+    },
+    "runtime_compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default", "deepseek"],
+      "properties": {
+        "default": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["structured_protocol", "fallback_errors", "max_protocol_retries"],
+          "properties": {
+            "structured_protocol": {"const": "native"},
+            "fallback_errors": {"maxItems": 0},
+            "max_protocol_retries": {"const": 0}
+          }
+        },
+        "deepseek": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["match_substrings", "structured_protocol", "fallback_errors", "max_protocol_retries", "change_model", "change_safety"],
+          "properties": {
+            "match_substrings": {"const": ["deepseek"]},
+            "structured_protocol": {"const": "plain_json_then_validate"},
+            "fallback_errors": {"const": ["Thinking mode does not support this tool_choice"]},
+            "max_protocol_retries": {"const": 1},
+            "change_model": {"const": false},
+            "change_safety": {"const": false}
+          }
+        }
+      }
+    },
+    "artifact_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "preserve_user_inputs", "preserve_stage_outputs", "allow_delete", "index_contract"],
+      "properties": {
+        "mode": {"const": "append_only"},
+        "preserve_user_inputs": {"const": true},
+        "preserve_stage_outputs": {"const": true},
+        "allow_delete": {"const": false},
+        "index_contract": {"const": "mozaika-artifact-index/v1"}
+      }
+    },
+    "skill_selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "decision_contract", "inventory_scope", "external_catalog", "official_anthropic_repository", "installed_anthropic_skills", "source_priority", "ranking_order", "acquisition", "retry_policy", "excluded_skills", "owner_designated_presentation_skill", "presentation_candidate_hints"],
+      "properties": {
+        "mode": {"const": "evaluate_before_each_stage"},
+        "decision_contract": {"const": "mozaika-skill-selection/v1"},
+        "inventory_scope": {"const": "installed_external_first_then_discoverable"},
+        "external_catalog": {"const": "references/external-skill-catalog.md"},
+        "official_anthropic_repository": {"const": "https://github.com/anthropics/skills"},
+        "installed_anthropic_skills": {"const": ["anthropic-dashboard-architect", "anthropic-data-validation", "anthropic-data-visualization", "anthropic-interactive-dashboard-builder", "anthropic-performance-analytics", "anthropic-pptx", "anthropic-snowflake-semanticview", "anthropic-sql-queries", "anthropic-statistical-analysis"]},
+        "source_priority": {"const": ["owner_designated_installed_reviewed", "installed_anthropic_reviewed", "installed_reviewed", "anthropic_official_discoverable", "ouroboroshub_official", "other_reviewed"]},
+        "ranking_order": {"const": ["stage_contract_fit", "expected_output_quality", "verification_strength", "official_anthropic_provenance", "runtime_compatibility", "fresh_review", "dependency_cost"]},
+        "acquisition": {"$ref": "#/$defs/acquisition"},
+        "retry_policy": {"$ref": "#/$defs/retry_policy"},
+        "excluded_skills": {"const": ["anthropic-pptx"]},
+        "owner_designated_presentation_skill": {"const": "html-presentation-studio"},
+        "presentation_candidate_hints": {"const": ["html-presentation-studio", "anthropic-interactive-dashboard-builder", "anthropic-dashboard-architect"]}
+      }
+    },
+    "acquisition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allow_discovery", "allow_download_to_staging", "persistent_install_requires_owner_approval", "require_exact_source_provenance", "require_skill_preflight", "require_skill_review", "require_owner_grants", "require_enablement"],
+      "properties": {
+        "allow_discovery": {"const": true},
+        "allow_download_to_staging": {"const": true},
+        "persistent_install_requires_owner_approval": {"const": true},
+        "require_exact_source_provenance": {"const": true},
+        "require_skill_preflight": {"const": true},
+        "require_skill_review": {"const": true},
+        "require_owner_grants": {"const": true},
+        "require_enablement": {"const": true}
+      }
+    },
+    "retry_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["same_skill_transient_retries", "reselect_after_contract_failure", "reselect_after_repeated_execution_failure", "forbid_unchanged_retry"],
+      "properties": {
+        "same_skill_transient_retries": {"const": 1},
+        "reselect_after_contract_failure": {"const": true},
+        "reselect_after_repeated_execution_failure": {"const": true},
+        "forbid_unchanged_retry": {"const": true}
+      }
+    },
+    "skill_pool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope", "selection_policy", "readiness_policy", "external_mutation_policy", "required_selection_receipts", "required_execution_receipts", "excluded_skills"],
+      "properties": {
+        "scope": {"const": "all_ready_and_discoverable"},
+        "selection_policy": {"const": "evaluate_before_each_stage"},
+        "readiness_policy": {"const": "fresh_review_and_dependencies"},
+        "external_mutation_policy": {"const": "owner_choice"},
+        "required_selection_receipts": {"const": true},
+        "required_execution_receipts": {"const": true},
+        "excluded_skills": {"const": ["anthropic-pptx"]}
+      }
+    },
+    "agent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agent_id", "enabled", "transport", "skill_pool", "model_lane", "timeout_sec", "input_contract", "output_contract", "required_capabilities", "options"],
+      "properties": {
+        "agent_id": {"type": "string", "pattern": "^mozaika-[a-z0-9-]+-agent$"},
+        "enabled": {"const": true},
+        "transport": {"const": "local_task_skill"},
+        "skill_pool": {"const": "adaptive-full"},
+        "model_lane": {"enum": ["auto", "main", "heavy", "light", "review", "scope"]},
+        "timeout_sec": {"type": "integer", "minimum": 1, "maximum": 3600},
+        "input_contract": {"type": "string", "minLength": 1},
+        "output_contract": {"type": "string", "minLength": 1},
+        "required_capabilities": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "options": {"type": "object"}
+      }
+    },
+    "a2a": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "allowed_endpoints", "discover_before_send", "required_protocol_version", "client_password_env", "shared_artifact_root", "remote_text_is_untrusted", "tool_names"],
+      "properties": {
+        "enabled": {"const": false},
+        "allowed_endpoints": {"maxItems": 0},
+        "discover_before_send": {"const": true},
+        "required_protocol_version": {"type": "string", "minLength": 1},
+        "client_password_env": {"type": "string", "minLength": 1},
+        "shared_artifact_root": {"type": "string"},
+        "remote_text_is_untrusted": {"const": true},
+        "tool_names": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["discover", "send", "status"],
+          "properties": {
+            "discover": {"type": "string", "minLength": 1},
+            "send": {"type": "string", "minLength": 1},
+            "status": {"type": "string", "minLength": 1}
+          }
+        }
+      }
+    },
+    "decision_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default_class", "rules"],
+      "properties": {
+        "default_class": {"const": "owner_choice"},
+        "rules": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["tag", "class", "criteria"],
+            "properties": {
+              "tag": {"enum": ["routine-formatting", "known-source-resolution", "approved-brand-refresh", "reversible-cleaning", "likely-outlier-exclusion", "known-schema-repair", "skill-installation", "narrative-strategy", "insight-grouping", "meaning-changing-data-conflict", "new-authority"]},
+              "class": {"enum": ["silent", "notify", "owner_choice"]},
+              "criteria": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      }
+    }
+  }
+}

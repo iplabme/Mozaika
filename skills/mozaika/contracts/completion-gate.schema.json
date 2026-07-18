@@ -1,0 +1,266 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mozaika.local/contracts/completion-gate-v1.schema.json",
+  "title": "mozaika-completion-gate/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "run_id", "scenario", "owner_choice_gate_passed", "requested_status", "scope", "claims", "artifacts", "runtime", "visual_qa", "brandbook_conformance_gates", "design_receipts", "business_language_audits", "layout_audits", "unresolved"],
+  "properties": {
+    "contract_version": {"const": "mozaika-completion-gate/v1"},
+    "run_id": {"type": "string", "minLength": 1},
+    "scenario": {"enum": ["routine_report", "insight_deck", "weekly_autopilot"]},
+    "owner_choice_gate_passed": {"type": "boolean"},
+    "requested_status": {"enum": ["solved", "best_effort", "blocked_with_evidence"]},
+    "scope": {"$ref": "https://mozaika.local/contracts/scope-ledger-v1.schema.json"},
+    "claims": {"$ref": "https://mozaika.local/contracts/claim-registry-v1.schema.json"},
+    "artifacts": {"$ref": "https://mozaika.local/contracts/artifact-index-v1.schema.json"},
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["execution_status", "objective_status", "review_status", "verification_failures"],
+      "properties": {
+        "execution_status": {"enum": ["ok", "degraded", "failed"]},
+        "objective_status": {"enum": ["passed", "satisfied", "not_evaluated", "failed"]},
+        "review_status": {"enum": ["passed", "not_required", "skipped", "failed"]},
+        "verification_failures": {"type": "boolean"}
+      }
+    },
+    "visual_qa": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "status", "artifact_ids"],
+      "properties": {
+        "required": {"type": "boolean"},
+        "status": {"enum": ["passed", "failed", "unavailable", "not_required"]},
+        "artifact_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "brandbook_conformance_gates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["ok", "gate", "errors", "warnings", "metrics"],
+        "properties": {
+          "ok": {"const": true},
+          "gate": {"const": "brandbook_conformance"},
+          "errors": {"type": "array", "maxItems": 0},
+          "warnings": {"type": "array", "items": {"type": "string"}},
+          "metrics": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["artifact_type", "artifact_id", "html_sha256", "source_checked", "brandbook_version", "brandbook_marker", "core_palette_exact", "forbidden_color_hits", "template_required", "template_exact", "template_sha256"],
+            "properties": {
+              "artifact_type": {"enum": ["storytelling_cards", "selected_storytelling_card", "presentation", "speaker_story_cards"]},
+              "artifact_id": {"type": "string", "minLength": 1},
+              "html_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+              "source_checked": {"const": true},
+              "brandbook_version": {"const": "mozaika-brandbook/v1"},
+              "brandbook_marker": {"const": true},
+              "core_palette_exact": {"const": true},
+              "forbidden_color_hits": {"const": 0},
+              "template_required": {"type": "boolean"},
+              "template_exact": {"const": true},
+              "template_sha256": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"}
+            }
+          }
+        }
+      },
+      "allOf": [
+        {"contains": {"properties": {"metrics": {"properties": {"artifact_type": {"const": "presentation"}}, "required": ["artifact_type"]}}, "required": ["metrics"]}, "minContains": 1}
+      ]
+    },
+    "design_receipts": {
+      "type": "array",
+      "minItems": 2,
+      "items": {"$ref": "https://mozaika.local/contracts/design-receipt-v1.schema.json"}
+    },
+    "business_language_audits": {
+      "type": "array",
+      "minItems": 2,
+      "items": {"$ref": "https://mozaika.local/contracts/business-language-audit-v1.schema.json"},
+      "allOf": [
+        {"contains": {"properties": {"artifact_type": {"const": "dashboard"}, "status": {"const": "pass"}}, "required": ["artifact_type", "status"]}, "minContains": 1},
+        {"contains": {"properties": {"artifact_type": {"const": "presentation"}, "status": {"const": "pass"}}, "required": ["artifact_type", "status"]}, "minContains": 1}
+      ]
+    },
+    "layout_audits": {
+      "type": "array",
+      "minItems": 2,
+      "items": {"$ref": "https://mozaika.local/contracts/visual-layout-audit-v1.schema.json"},
+      "allOf": [
+        {"contains": {"properties": {"artifact_type": {"const": "dashboard"}}, "required": ["artifact_type"]}, "minContains": 1},
+        {"contains": {"properties": {"artifact_type": {"const": "presentation"}}, "required": ["artifact_type"]}, "minContains": 1}
+      ]
+    },
+    "research_brief": {"$ref": "https://mozaika.local/contracts/research-brief-v1.schema.json"},
+    "requirement_claim_map": {"$ref": "https://mozaika.local/contracts/requirement-claim-map-v1.schema.json"},
+    "owner_decision_checkpoint": {"$ref": "https://mozaika.local/contracts/owner-decision-checkpoint-v1.schema.json"},
+    "narrative_integrity_audits": {
+      "type": "array",
+      "items": {"$ref": "https://mozaika.local/contracts/narrative-integrity-audit-v1.schema.json"}
+    },
+    "presentation_outline_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ok", "outline_artifact_id", "outline_sha256"],
+      "properties": {
+        "ok": {"const": true},
+        "outline_artifact_id": {"type": "string", "minLength": 1},
+        "outline_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    },
+    "presentation_execution_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skill_name", "review_status", "outline_sha256", "output_artifact_ids", "status"],
+      "properties": {
+        "skill_name": {"type": "string", "minLength": 1},
+        "review_status": {"const": "fresh"},
+        "outline_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "output_artifact_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "status": {"const": "pass"}
+      }
+    },
+    "pptx_execution_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skill_name", "review_status", "style_preset", "reference_id", "reference_sha256", "reference_usage", "outline_sha256", "output_artifact_ids", "rendered_slide_qa_artifact_ids", "status"],
+      "properties": {
+        "skill_name": {"const": "presentation-skill"},
+        "review_status": {"const": "fresh"},
+        "style_preset": {"enum": ["mozaika-weekly", "mozaika-insight"]},
+        "reference_id": {"type": "string", "minLength": 1},
+        "reference_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "reference_usage": {"enum": ["fixed-template", "visual-grammar-only"]},
+        "outline_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "output_artifact_ids": {"type": "array", "minItems": 1, "maxItems": 1, "items": {"type": "string", "minLength": 1}},
+        "rendered_slide_qa_artifact_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "status": {"const": "pass"}
+      }
+    },
+    "speaker_story_cards": {"$ref": "https://mozaika.local/contracts/speaker-story-cards-v1.schema.json"},
+    "speaker_story_cards_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ok", "contract_artifact_id", "contract_sha256", "html_artifact_id", "html_sha256", "outline_sha256", "presentation_sha256"],
+      "properties": {
+        "ok": {"const": true},
+        "contract_artifact_id": {"type": "string", "minLength": 1},
+        "contract_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "html_artifact_id": {"type": "string", "minLength": 1},
+        "html_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "outline_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "presentation_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    },
+    "unresolved": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  },
+  "allOf": [
+    {
+      "properties": {
+        "design_receipts": {
+          "allOf": [
+            {"contains": {"properties": {"artifact_type": {"const": "dashboard"}}, "required": ["artifact_type"]}, "minContains": 1},
+            {"contains": {"properties": {"artifact_type": {"const": "presentation"}}, "required": ["artifact_type"]}, "minContains": 1}
+          ]
+        }
+      }
+    },
+    {
+      "if": {"properties": {"scenario": {"const": "insight_deck"}}},
+      "then": {
+        "properties": {
+          "owner_choice_gate_passed": {"const": true},
+          "design_receipts": {
+            "allOf": [
+              {"contains": {"properties": {"artifact_type": {"const": "storytelling_cards"}}, "required": ["artifact_type"]}, "minContains": 1},
+              {"contains": {"properties": {"artifact_type": {"const": "selected_storytelling_card"}}, "required": ["artifact_type"]}, "minContains": 1},
+              {"contains": {"properties": {"artifact_type": {"const": "speaker_story_cards"}}, "required": ["artifact_type"]}, "minContains": 1}
+            ]
+          },
+          "brandbook_conformance_gates": {
+            "allOf": [
+              {"contains": {"properties": {"metrics": {"properties": {"artifact_type": {"const": "storytelling_cards"}}, "required": ["artifact_type"]}}, "required": ["metrics"]}, "minContains": 1},
+              {"contains": {"properties": {"metrics": {"properties": {"artifact_type": {"const": "selected_storytelling_card"}}, "required": ["artifact_type"]}}, "required": ["metrics"]}, "minContains": 1},
+              {"contains": {"properties": {"metrics": {"properties": {"artifact_type": {"const": "speaker_story_cards"}, "template_required": {"const": true}}, "required": ["artifact_type", "template_required"]}}, "required": ["metrics"]}, "minContains": 1}
+            ]
+          },
+          "business_language_audits": {
+            "minItems": 5,
+            "allOf": [
+              {"contains": {"properties": {"artifact_type": {"const": "storytelling_cards"}, "status": {"const": "pass"}}, "required": ["artifact_type", "status"]}, "minContains": 1},
+              {"contains": {"properties": {"artifact_type": {"const": "selected_storytelling_card"}, "status": {"const": "pass"}}, "required": ["artifact_type", "status"]}, "minContains": 1},
+              {"contains": {"properties": {"artifact_type": {"const": "speaker_story_cards"}, "status": {"const": "pass"}}, "required": ["artifact_type", "status"]}, "minContains": 1}
+            ]
+          },
+          "layout_audits": {
+            "minItems": 3,
+            "allOf": [
+              {"contains": {"properties": {"artifact_type": {"const": "speaker_story_cards"}, "status": {"const": "pass"}}, "required": ["artifact_type", "status"]}, "minContains": 1}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"scenario": {"enum": ["routine_report", "insight_deck", "weekly_autopilot"]}}, "required": ["scenario"]},
+      "then": {
+        "required": ["pptx_execution_receipt"]
+      }
+    },
+    {
+      "if": {"properties": {"scenario": {"enum": ["routine_report", "weekly_autopilot"]}}, "required": ["scenario"]},
+      "then": {
+        "properties": {
+          "pptx_execution_receipt": {
+            "properties": {
+              "style_preset": {"const": "mozaika-weekly"},
+              "reference_id": {"const": "scenario-2-sprint25-review-pptx"},
+              "reference_sha256": {"const": "d3a650c204ee9f9ea17daf94fae97a226e57ca13ecbbf7cf19e53f3e71969265"},
+              "reference_usage": {"const": "fixed-template"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"scenario": {"const": "insight_deck"}}, "required": ["scenario"]},
+      "then": {
+        "properties": {
+          "pptx_execution_receipt": {
+            "properties": {
+              "style_preset": {"const": "mozaika-insight"},
+              "reference_id": {"const": "scenario-insight-ds-role-analytics-pptx"},
+              "reference_sha256": {"const": "66430f7a96d66546eaa6c9fd8fad971e925a40c09ce2e2ae91047f16263a6c1d"},
+              "reference_usage": {"const": "visual-grammar-only"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {"scenario": {"const": "insight_deck"}},
+        "required": ["research_brief"]
+      },
+      "then": {
+        "required": ["requirement_claim_map", "owner_decision_checkpoint", "narrative_integrity_audits", "presentation_outline_gate", "presentation_execution_receipt", "speaker_story_cards", "speaker_story_cards_gate"],
+        "properties": {
+          "narrative_integrity_audits": {
+            "minItems": 5,
+            "allOf": [
+              {"contains": {"properties": {"artifact_type": {"const": "storytelling_cards"}, "status": {"const": "pass"}}, "required": ["artifact_type", "status"]}, "minContains": 1},
+              {"contains": {"properties": {"artifact_type": {"const": "selected_storytelling_card"}, "status": {"const": "pass"}}, "required": ["artifact_type", "status"]}, "minContains": 1},
+              {"contains": {"properties": {"artifact_type": {"const": "storyline"}, "status": {"const": "pass"}}, "required": ["artifact_type", "status"]}, "minContains": 1},
+              {"contains": {"properties": {"artifact_type": {"const": "presentation"}, "status": {"const": "pass"}}, "required": ["artifact_type", "status"]}, "minContains": 1},
+              {"contains": {"properties": {"artifact_type": {"const": "speaker_story_cards"}, "status": {"const": "pass"}}, "required": ["artifact_type", "status"]}, "minContains": 1}
+            ]
+          },
+          "owner_decision_checkpoint": {"properties": {"state": {"const": "selected"}}}
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "title": "{{REPORT_TITLE}}",
+  "subtitle": "{{REPORT_SUBTITLE}}",
+  "deck_style": {
+    "visual_density": "medium",
+    "page_system": "board-ledger",
+    "header_mode": "eyebrow",
+    "title_layout": "light-atlas",
+    "title_motif": "editorial",
+    "chart_treatment": "facts-below",
+    "table_treatment": "compact-ledger",
+    "footer_mode": "source-line",
+    "footer_source_label": "Источник",
+    "footer_refs_label": "Данные",
+    "footer_page_numbers": true,
+    "style_seed": "mozaika-weekly-v1"
+  },
+  "slides": [
+    {
+      "type": "title",
+      "title": "{{REPORT_TITLE}}",
+      "subtitle": "{{REPORT_SUBTITLE}}"
+    },
+    {
+      "type": "content",
+      "variant": "cards-3",
+      "title": "Контекст",
+      "cards": [
+        {"title": "Что измеряем", "body": "{{MEASURES}}"},
+        {"title": "Как сравниваем", "body": "{{BASELINE}}"},
+        {"title": "Зачем", "body": "{{DECISION}}"}
+      ]
+    },
+    {
+      "type": "content",
+      "variant": "stats",
+      "title": "Главное в цифрах",
+      "subtitle": "{{KPI_GOVERNING_THOUGHT}}",
+      "stats": [
+        {"label": "KPI 1", "value": "{{KPI_1}}", "note": "{{KPI_1_NOTE}}"},
+        {"label": "KPI 2", "value": "{{KPI_2}}", "note": "{{KPI_2_NOTE}}"},
+        {"label": "KPI 3", "value": "{{KPI_3}}", "note": "{{KPI_3_NOTE}}"},
+        {"label": "Риски", "value": "{{RISK_COUNT}}", "note": "{{RISK_NOTE}}"}
+      ]
+    },
+    {
+      "type": "content",
+      "variant": "chart",
+      "title": "{{TREND_TITLE}}",
+      "subtitle": "{{TREND_INSIGHT}}",
+      "assets": {
+        "chart_data": {
+          "type": "bar",
+          "title": "{{TREND_CHART_TITLE}}",
+          "categories": ["{{PERIOD_1}}", "{{PERIOD_2}}", "{{PERIOD_3}}"],
+          "series": [{"name": "{{METRIC_NAME}}", "values": [0, 0, 0]}]
+        }
+      }
+    },
+    {
+      "type": "content",
+      "variant": "kpi-hero",
+      "title": "{{ANOMALY_TITLE}}",
+      "subtitle": "{{ANOMALY_EVIDENCE}}",
+      "kpi": {"label": "Отклонение", "value": "{{ANOMALY_VALUE}}", "note": "{{ANOMALY_BASELINE}}"}
+    },
+    {
+      "type": "content",
+      "variant": "table",
+      "title": "Полная картина",
+      "headers": ["Объект", "Сегмент", "Показатель", "Качество", "Риск"],
+      "rows": [["{{ENTITY}}", "{{SEGMENT}}", "{{VALUE}}", "{{QUALITY}}", "{{RISK}}"]]
+    },
+    {
+      "type": "content",
+      "variant": "timeline",
+      "title": "Что делаем дальше",
+      "items": [
+        {"title": "Действие 1", "body": "{{ACTION_1}}"},
+        {"title": "Действие 2", "body": "{{ACTION_2}}"},
+        {"title": "Действие 3", "body": "{{ACTION_3}}"}
+      ]
+    }
+  ]
+}

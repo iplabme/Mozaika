@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mozaika.local/contracts/routine-learning-v1.schema.json",
+  "title": "mozaika-routine-learning/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "knowledge_key", "report_id", "source_contract_hash", "accepted_at", "learned_rules", "validation"],
+  "properties": {
+    "contract_version": {"const": "mozaika-routine-learning/v1"},
+    "knowledge_key": {"type": "string", "pattern": "^mozaika-routine-[a-z0-9][a-z0-9-]*$"},
+    "report_id": {"type": "string", "minLength": 1},
+    "source_contract_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "accepted_at": {"type": "string", "format": "date-time"},
+    "learned_rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rule_id", "scope", "instruction", "evidence", "reversible"],
+        "properties": {
+          "rule_id": {"type": "string", "minLength": 1},
+          "scope": {"enum": ["source", "schema", "kpi", "cleaning", "dashboard", "storyline", "presentation", "delivery"]},
+          "instruction": {"type": "string", "minLength": 1},
+          "evidence": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+          "reversible": {"type": "boolean"}
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reuse_requires_source_match", "reuse_requires_schema_match", "meaning_change_requires_owner_choice"],
+      "properties": {
+        "reuse_requires_source_match": {"const": true},
+        "reuse_requires_schema_match": {"const": true},
+        "meaning_change_requires_owner_choice": {"const": true}
+      }
+    }
+  }
+}

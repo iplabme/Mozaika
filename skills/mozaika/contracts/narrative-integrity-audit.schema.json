@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mozaika.local/contracts/narrative-integrity-audit-v1.schema.json",
+  "title": "mozaika-narrative-integrity-audit/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "run_id", "artifact_id", "artifact_sha256", "artifact_type", "research_brief_sha256", "algorithm", "status", "checks", "duplicate_findings", "coverage"],
+  "properties": {
+    "contract_version": {"const": "mozaika-narrative-integrity-audit/v1"},
+    "run_id": {"type": "string", "minLength": 1},
+    "artifact_id": {"type": "string", "minLength": 1},
+    "artifact_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "artifact_type": {"enum": ["storytelling_cards", "selected_storytelling_card", "storyline", "presentation", "speaker_story_cards"]},
+    "research_brief_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "algorithm": {"const": "mozaika-narrative-integrity-v1"},
+    "status": {"enum": ["pass", "revise"]},
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verbatim_scope_complete", "no_exact_duplicates", "no_high_confidence_near_duplicates", "claim_links_valid", "selected_story_preserved", "screen_mapping_valid"],
+      "properties": {
+        "verbatim_scope_complete": {"type": "boolean"},
+        "no_exact_duplicates": {"type": "boolean"},
+        "no_high_confidence_near_duplicates": {"type": "boolean"},
+        "claim_links_valid": {"type": "boolean"},
+        "selected_story_preserved": {"type": "boolean"},
+        "screen_mapping_valid": {"type": "boolean"}
+      }
+    },
+    "duplicate_findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["left_path", "right_path", "kind", "similarity"],
+        "properties": {
+          "left_path": {"type": "string", "minLength": 1},
+          "right_path": {"type": "string", "minLength": 1},
+          "kind": {"enum": ["exact", "containment", "token_overlap"]},
+          "similarity": {"type": "number", "minimum": 0, "maximum": 1}
+        }
+      }
+    },
+    "coverage": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["requirement_id", "text_verbatim", "status", "target_ids", "claim_ids"],
+        "properties": {
+          "requirement_id": {"type": "string", "pattern": "^req-[a-z0-9][a-z0-9_-]{0,63}$"},
+          "text_verbatim": {"type": "string", "minLength": 1, "maxLength": 2000},
+          "status": {"enum": ["covered", "partial", "unanswered", "applied_global"]},
+          "target_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "claim_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "pass"}}, "required": ["status"]},
+      "then": {
+        "properties": {
+          "duplicate_findings": {"maxItems": 0},
+          "checks": {
+            "properties": {
+              "verbatim_scope_complete": {"const": true},
+              "no_exact_duplicates": {"const": true},
+              "no_high_confidence_near_duplicates": {"const": true},
+              "claim_links_valid": {"const": true},
+              "selected_story_preserved": {"const": true},
+              "screen_mapping_valid": {"const": true}
+            }
+          }
+        }
+      }
+    }
+  ]
+}

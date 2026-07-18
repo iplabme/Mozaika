@@ -1,0 +1,424 @@
+{
+  "contract_version": "1.3",
+  "pool_name": "mozaika-adaptive",
+  "state": {
+    "source": "project_workpad",
+    "workpad_key": "mozaika-pool/v1",
+    "file_overrides_allowed": false
+  },
+  "pipelines": {
+    "routine_report": ["data", "dashboard", "presentation", "pptx"],
+    "insight_deck": ["data", "dashboard", "storyline", "presentation", "speaker_cards", "pptx"],
+    "weekly_autopilot": ["data", "dashboard", "anomaly_analysis", "presentation", "pptx"]
+  },
+  "runtime_compatibility": {
+    "default": {
+      "structured_protocol": "native",
+      "fallback_errors": [],
+      "max_protocol_retries": 0
+    },
+    "deepseek": {
+      "match_substrings": ["deepseek"],
+      "structured_protocol": "plain_json_then_validate",
+      "fallback_errors": ["Thinking mode does not support this tool_choice"],
+      "max_protocol_retries": 1,
+      "change_model": false,
+      "change_safety": false
+    }
+  },
+  "artifact_policy": {
+    "mode": "append_only",
+    "preserve_user_inputs": true,
+    "preserve_stage_outputs": true,
+    "allow_delete": false,
+    "index_contract": "mozaika-artifact-index/v1"
+  },
+  "design_system": {
+    "authority": "owner_brandbook",
+    "project_path": "brandbook/BRANDBOOK.md",
+    "runtime_path": "data/brandbook/mozaika/BRANDBOOK.md",
+    "manifest_path": "data/brandbook/mozaika/manifest.json",
+    "tokens_path": "data/brandbook/mozaika/tokens.css",
+    "references_path": "data/brandbook/mozaika/references",
+    "enforcement": "required_for_generation",
+    "renderer_defaults_allowed": false,
+    "owner_override_required": true,
+    "receipt_contract": "mozaika-design-receipt/v1"
+  },
+  "skill_selection": {
+    "mode": "evaluate_before_each_stage",
+    "decision_contract": "mozaika-skill-selection/v1",
+    "inventory_scope": "installed_external_first_then_discoverable",
+    "external_catalog": "references/external-skill-catalog.md",
+    "official_anthropic_repository": "https://github.com/anthropics/skills",
+    "installed_anthropic_skills": [
+      "anthropic-dashboard-architect",
+      "anthropic-data-validation",
+      "anthropic-data-visualization",
+      "anthropic-interactive-dashboard-builder",
+      "anthropic-performance-analytics",
+      "anthropic-pptx",
+      "anthropic-snowflake-semanticview",
+      "anthropic-sql-queries",
+      "anthropic-statistical-analysis"
+    ],
+    "source_priority": [
+      "owner_designated_installed_reviewed",
+      "installed_anthropic_reviewed",
+      "installed_reviewed",
+      "anthropic_official_discoverable",
+      "ouroboroshub_official",
+      "other_reviewed"
+    ],
+    "ranking_order": [
+      "stage_contract_fit",
+      "expected_output_quality",
+      "verification_strength",
+      "official_anthropic_provenance",
+      "runtime_compatibility",
+      "fresh_review",
+      "dependency_cost"
+    ],
+    "acquisition": {
+      "allow_discovery": true,
+      "allow_download_to_staging": true,
+      "persistent_install_requires_owner_approval": true,
+      "require_exact_source_provenance": true,
+      "require_skill_preflight": true,
+      "require_skill_review": true,
+      "require_owner_grants": true,
+      "require_enablement": true
+    },
+    "retry_policy": {
+      "same_skill_transient_retries": 1,
+      "reselect_after_contract_failure": true,
+      "reselect_after_repeated_execution_failure": true,
+      "forbid_unchanged_retry": true
+    },
+    "excluded_skills": ["anthropic-pptx"],
+    "owner_designated_presentation_skill": "html-presentation-studio",
+    "presentation_candidate_hints": [
+      "html-presentation-studio",
+      "anthropic-interactive-dashboard-builder",
+      "anthropic-dashboard-architect"
+    ]
+  },
+  "skill_pools": {
+    "adaptive-full": {
+      "scope": "all_ready_and_discoverable",
+      "selection_policy": "evaluate_before_each_stage",
+      "readiness_policy": "fresh_review_and_dependencies",
+      "external_mutation_policy": "owner_choice",
+      "required_selection_receipts": true,
+      "required_execution_receipts": true,
+      "excluded_skills": ["anthropic-pptx"]
+    }
+  },
+  "agents": {
+    "data": {
+      "agent_id": "mozaika-data-agent",
+      "enabled": true,
+      "transport": "local_task_skill",
+      "skill_pool": "adaptive-full",
+      "model_lane": "heavy",
+      "timeout_sec": 900,
+      "input_contract": "mozaika-handoff/request-v1",
+      "output_contract": "mozaika-data-package/v1",
+      "required_capabilities": ["source-inventory", "data-profiling", "reversible-cleaning", "claim-evidence"],
+      "options": {
+        "preserve_raw": true,
+        "require_lineage": true,
+        "outlier_policy": "exclude-and-notify",
+        "scope_contract": "mozaika-scope-ledger/v1",
+        "claim_contract": "mozaika-claim-registry/v1",
+        "require_all_requested_sources": true,
+        "agenda_reference": "references/user-agenda-coverage.md",
+        "reread_assignment_at_stage_boundaries": true,
+        "owner_items_first": true,
+        "preserve_owner_item_order": true
+      }
+    },
+    "dashboard": {
+      "agent_id": "mozaika-dashboard-agent",
+      "enabled": true,
+      "transport": "local_task_skill",
+      "skill_pool": "adaptive-full",
+      "model_lane": "heavy",
+      "timeout_sec": 900,
+      "input_contract": "mozaika-data-package/v1",
+      "output_contract": "mozaika-dashboard-package/v1",
+      "required_capabilities": ["dashboard-rendering", "claim-chart-mapping", "filterable-sortable-tables", "cross-filtered-visuals", "owner-view-customization", "research-scope-tracing", "visual-qa", "narrative-previews"],
+      "options": {
+        "max_strategy_previews": 3,
+        "require_claim_chart_mapping": true,
+        "owner_choice_surface": "separate-storytelling-cards-html",
+        "dashboard_surface_policy": "exclude-storytelling-cards",
+        "require_visual_previews": true,
+        "require_validated_claims": true,
+        "require_configurable_charts": true,
+        "require_filterable_tables": true,
+        "require_functional_filters": true,
+        "require_table_search_and_sort": true,
+        "require_owner_view_customization": true,
+        "require_customization_reset": true,
+        "require_research_scope_coverage": true,
+        "preserve_research_title_verbatim": true,
+        "agenda_reference": "references/user-agenda-coverage.md",
+        "reread_assignment_at_stage_boundaries": true,
+        "owner_items_first": true,
+        "filter_alone_is_not_coverage": true,
+        "owner_named_choices_take_priority": true,
+        "dashboard_quality_reference": "references/dashboard-quality.md",
+        "owner_domain_profile_required": true,
+        "brandbook_required": true,
+        "design_receipt_required": true
+      }
+    },
+    "anomaly_analysis": {
+      "agent_id": "mozaika-anomaly-analysis-agent",
+      "enabled": true,
+      "transport": "local_task_skill",
+      "skill_pool": "adaptive-full",
+      "model_lane": "heavy",
+      "timeout_sec": 900,
+      "input_contract": "mozaika-dashboard-package/v1",
+      "output_contract": "mozaika-anomaly-package/v1",
+      "required_capabilities": ["historical-baseline", "target-comparison", "peer-comparison", "anomaly-ranking", "claim-evidence"],
+      "options": {
+        "scenario_scope": ["weekly_autopilot"],
+        "run_after_dashboard_calculation": true,
+        "require_fact_baseline_deviation_impact": true,
+        "reject_extreme_without_context": true,
+        "preserve_all_candidates": true,
+        "notify_reversible_exclusions": true
+      }
+    },
+    "storyline": {
+      "agent_id": "mozaika-storyline-agent",
+      "enabled": true,
+      "transport": "local_task_skill",
+      "skill_pool": "adaptive-full",
+      "model_lane": "heavy",
+      "timeout_sec": 900,
+      "input_contract": "mozaika-dashboard-package/v1",
+      "output_contract": "mozaika-storyline-package/v1",
+      "required_capabilities": ["executive-storyline", "evidence-mapping", "research-scope-tracing", "verbatim-research-title", "slide-intents", "narrative-review"],
+      "options": {
+        "storyline_before_slides": true,
+        "require_selected_strategy": true,
+        "presentation_outline_contract": "presentation-outline/v1",
+        "require_claim_ids": true,
+        "require_research_question_coverage": true,
+        "preserve_research_title_verbatim": true,
+        "agenda_reference": "references/user-agenda-coverage.md",
+        "reread_assignment_at_stage_boundaries": true,
+        "preserve_owner_item_order_or_explain_reordering": true,
+        "proactive_insights_after_owner_items": true,
+        "inherit_output_language": true,
+        "brandbook_ref_required": true
+      }
+    },
+    "presentation": {
+      "agent_id": "mozaika-presentation-agent",
+      "enabled": true,
+      "transport": "local_task_skill",
+      "skill_pool": "adaptive-full",
+      "model_lane": "heavy",
+      "timeout_sec": 900,
+      "input_contract": "presentation-outline/v1",
+      "output_contract": "mozaika-presentation-package/v1",
+      "required_capabilities": ["self-contained-rich-html", "storyline-slide-navigation", "interactive-data-visuals", "evidence-rich-diagrams", "research-scope-tracing", "verbatim-research-title", "smooth-page-transitions", "responsive-layout", "visual-qa"],
+      "options": {
+        "excluded_skills": ["anthropic-pptx", "presentation-skill"],
+        "preferred_renderer_skill": "html-presentation-studio",
+        "brandbook_required": true,
+        "brandbook_theme": "mozaika-reference",
+        "design_receipt_required": true,
+        "output_format": "html",
+        "delivery_mode": "self-contained-single-file",
+        "require_keyboard_navigation": true,
+        "require_fullscreen": true,
+        "require_overview": true,
+        "require_evidence_rich_diagrams": true,
+        "require_research_question_coverage": true,
+        "preserve_research_title_verbatim": true,
+        "agenda_reference": "references/user-agenda-coverage.md",
+        "reread_assignment_before_render": true,
+        "owner_items_visible_on_slides": true,
+        "proactive_insights_after_owner_items": true,
+        "require_smooth_page_transitions": true,
+        "require_print_styles": true,
+        "require_accessibility": true,
+        "require_reduced_motion": true,
+        "require_rendered_qa": true,
+        "require_completion_gate": true,
+        "preserve_all_outputs": true
+      }
+    },
+    "speaker_cards": {
+      "agent_id": "mozaika-speaker-cards-agent",
+      "enabled": true,
+      "transport": "local_task_skill",
+      "skill_pool": "adaptive-full",
+      "model_lane": "heavy",
+      "timeout_sec": 900,
+      "input_contract": "mozaika-presentation-package/v1",
+      "output_contract": "mozaika-speaker-story-cards/v1",
+      "required_capabilities": ["executive-storytelling", "per-slide-speaker-cues", "claim-evidence", "self-contained-html", "visual-qa"],
+      "options": {
+        "template_path": "data/brandbook/mozaika/templates/speaker-story-cards.template.html",
+        "one_card_per_slide": true,
+        "preserve_slide_order": true,
+        "require_claim_ids_for_content_cards": true,
+        "agenda_reference": "references/user-agenda-coverage.md",
+        "explain_owner_item_on_matching_slide": true,
+        "hide_service_metadata": true,
+        "require_keyboard_navigation": true,
+        "require_touch_navigation": true,
+        "require_print_styles": true,
+        "require_reduced_motion": true,
+        "design_receipt_required": true,
+        "language_audit_required": true,
+        "layout_audit_required": true,
+        "narrative_integrity_audit_required": true
+      }
+    },
+    "pptx": {
+      "agent_id": "mozaika-pptx-agent",
+      "enabled": true,
+      "transport": "local_task_skill",
+      "skill_pool": "adaptive-full",
+      "model_lane": "heavy",
+      "timeout_sec": 900,
+      "input_contract": "mozaika-presentation-package/v1",
+      "output_contract": "mozaika-editable-pptx-package/v1",
+      "required_capabilities": ["editable-pptx", "native-charts", "native-tables", "template-aligned-layout", "rendered-slide-qa"],
+      "options": {
+        "scenario_scope": ["routine_report", "insight_deck", "weekly_autopilot"],
+        "required_renderer_skill": "presentation-skill",
+        "forbidden_renderer_skills": ["pptx", "anthropic-pptx"],
+        "agenda_reference": "references/user-agenda-coverage.md",
+        "reread_assignment_before_render": true,
+        "preserve_html_owner_agenda_coverage": true,
+        "run_as_final_production_step": true,
+        "style_preset_by_scenario": {
+          "routine_report": "mozaika-weekly",
+          "weekly_autopilot": "mozaika-weekly",
+          "insight_deck": "mozaika-insight"
+        },
+        "outline_template_by_scenario": {
+          "routine_report": "data/brandbook/mozaika/templates/scenario-2-presentation-skill-outline.example.json",
+          "weekly_autopilot": "data/brandbook/mozaika/templates/scenario-2-presentation-skill-outline.example.json",
+          "insight_deck": "data/brandbook/mozaika/templates/scenario-insight-presentation-skill-outline.example.json"
+        },
+        "reference_pptx_by_scenario": {
+          "routine_report": "data/brandbook/mozaika/references/scenario-2-sprint25-review-reference.pptx",
+          "weekly_autopilot": "data/brandbook/mozaika/references/scenario-2-sprint25-review-reference.pptx",
+          "insight_deck": "data/brandbook/mozaika/references/scenario-insight-ds-role-analytics-reference.pptx"
+        },
+        "reference_usage_by_scenario": {
+          "routine_report": "fixed-template",
+          "weekly_autopilot": "fixed-template",
+          "insight_deck": "visual-grammar-only"
+        },
+        "require_native_editable_charts_and_tables": true,
+        "require_all_slide_rendering": true,
+        "require_cross_format_claim_reconciliation": true,
+        "preserve_all_outputs": true
+      }
+    },
+    "business_language_validator": {
+      "agent_id": "mozaika-business-language-validator-agent",
+      "enabled": true,
+      "transport": "local_task_skill",
+      "skill_pool": "adaptive-full",
+      "model_lane": "review",
+      "timeout_sec": 900,
+      "input_contract": "mozaika-owner-facing-text-set/v1",
+      "output_contract": "mozaika-business-language-audit/v1",
+      "required_capabilities": ["business-russian-style", "free-heading-review", "body-copy-review", "verbatim-exception-protection", "minimal-rewrite", "presentation-copy-review", "evidence-preservation"],
+      "options": {
+        "invocations": ["after_dashboard", "after_storytelling_cards", "after_selected_storytelling_card", "after_presentation", "after_speaker_story_cards"],
+        "reference": "references/business-language-rules.md",
+        "baseline_method": "mozaika-business-language-rules",
+        "supporting_skill_optional": true,
+        "separate_passes": ["free_headings", "body_text"],
+        "protected_verbatim_sources": ["owner_supplied_title", "research_title_verbatim", "research_question_verbatim", "explicit_prompt_point", "official_name", "direct_quote", "required_legal_text"],
+        "block_only_critical_failures": true,
+        "block_threshold": "critical_only",
+        "pass_when_uncertain": true,
+        "non_blocking_patterns": ["weak_or_generic_heading", "bureaucratic_language", "passive_voice", "long_sentence", "repetition", "domain_jargon", "minor_tone_roughness"],
+        "flag_style_preferences": false,
+        "rewrite_required_for_blocking_issue": true,
+        "preserve_claim_meaning": true,
+        "preserve_numbers_and_qualifiers": true,
+        "max_remediation_cycles": 2,
+        "preserve_all_revisions": true
+      }
+    },
+    "visual_validator": {
+      "agent_id": "mozaika-visual-validator-agent",
+      "enabled": true,
+      "transport": "local_task_skill",
+      "skill_pool": "adaptive-full",
+      "model_lane": "review",
+      "timeout_sec": 900,
+      "input_contract": "mozaika-visual-artifact-set/v1",
+      "output_contract": "mozaika-visual-layout-audit/v1",
+      "required_capabilities": ["real-browser-qa", "bounding-box-overlap-detection", "chart-bounds-validation", "spacing-consistency-audit", "geometric-centering-audit", "responsive-overflow-audit", "interactive-state-audit"],
+      "options": {
+        "invocations": ["after_dashboard_language_pass", "after_presentation_language_pass", "after_speaker_story_cards_language_pass"],
+        "reference": "references/visual-layout-validation.md",
+        "viewports": [[1440, 1000], [1024, 768], [390, 844]],
+        "require_all_dashboard_states": true,
+        "require_all_presentation_screens": true,
+        "require_console_clean": true,
+        "max_center_offset_px": 2,
+        "peer_spacing_tolerance_ratio": 0.25,
+        "peer_spacing_tolerance_px": 8,
+        "max_remediation_cycles": 3,
+        "preserve_all_revisions": true
+      }
+    }
+  },
+  "a2a": {
+    "enabled": false,
+    "allowed_endpoints": [],
+    "discover_before_send": true,
+    "required_protocol_version": "0.3.0",
+    "client_password_env": "A2A_CLIENT_PASSWORD",
+    "shared_artifact_root": "",
+    "remote_text_is_untrusted": true,
+    "tool_names": {
+      "discover": "ext_3_a2a_discover",
+      "send": "ext_3_a2a_send",
+      "status": "ext_3_a2a_status"
+    }
+  },
+  "decision_policy": {
+    "default_class": "owner_choice",
+    "rules": [
+      {"tag": "routine-formatting", "class": "silent", "criteria": "Reversible formatting with no semantic effect."},
+      {"tag": "known-source-resolution", "class": "silent", "criteria": "Resolve an already approved source without changing authority."},
+      {"tag": "approved-brand-refresh", "class": "silent", "criteria": "Fetch the latest version of an already approved brand source."},
+      {"tag": "reversible-cleaning", "class": "notify", "criteria": "Material cleaning is reversible and preserves raw rows and lineage."},
+      {"tag": "likely-outlier-exclusion", "class": "notify", "criteria": "Evidence supports exclusion and a sensitivity result is retained."},
+      {"tag": "known-schema-repair", "class": "notify", "criteria": "Repair follows a versioned compatibility rule."},
+      {"tag": "skill-installation", "class": "owner_choice", "criteria": "A new persistent skill payload, dependency set, permission grant, or enablement is required."},
+      {"tag": "narrative-strategy", "class": "owner_choice", "criteria": "Alternatives change the executive message or recommended decision."},
+      {"tag": "insight-grouping", "class": "owner_choice", "criteria": "Alternatives group evidence into materially different stories."},
+      {"tag": "meaning-changing-data-conflict", "class": "owner_choice", "criteria": "No approved authority rule resolves conflicting evidence."},
+      {"tag": "new-authority", "class": "owner_choice", "criteria": "The action changes an external system or requires authority not in scope."}
+    ]
+  },
+  "learning": {
+    "knowledge_key_prefix": "mozaika-routine-",
+    "contract": "mozaika-routine-learning/v1",
+    "reuse_requires_validation": true,
+    "owner_domain_profile_key_prefix": "mozaika-owner-domain-",
+    "owner_domain_profile_contract": "mozaika-owner-domain-profile/v1",
+    "profile_updates_require_evidence": true,
+    "sensitive_inference_allowed": false,
+    "training_mode": "profile_memory_not_model_weights"
+  }
+}

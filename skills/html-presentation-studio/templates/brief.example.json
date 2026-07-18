@@ -1,0 +1,14 @@
+{
+  "title": "Presentation title",
+  "subtitle": "Optional subtitle",
+  "audience": "Who will watch",
+  "setting": "live talk",
+  "duration_minutes": 12,
+  "one_takeaway": "A full-sentence conclusion the audience should remember.",
+  "desired_action": "What the audience should do next.",
+  "language": "en",
+  "author": "Presenter",
+  "organization": "Organization",
+  "confidential": false,
+  "offline": false
+}

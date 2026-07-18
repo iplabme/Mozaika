@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mozaika.local/contracts/skill-selection.schema.json",
+  "title": "mozaika-skill-selection/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "run_id", "stage_id", "role", "evaluated_at", "required_capabilities", "anthropic_priority", "candidates", "status", "decision", "owner_approval_required"],
+  "properties": {
+    "contract_version": {"const": "mozaika-skill-selection/v1"},
+    "run_id": {"type": "string", "minLength": 1},
+    "stage_id": {"type": "string", "minLength": 1},
+    "role": {"enum": ["data", "dashboard", "storyline", "presentation"]},
+    "evaluated_at": {"type": "string", "format": "date-time"},
+    "required_capabilities": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "anthropic_priority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["matching_candidates", "selected_anthropic", "override_reason"],
+      "properties": {
+        "matching_candidates": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^anthropic-[a-z0-9-]+$"}},
+        "selected_anthropic": {"type": "boolean"},
+        "override_reason": {"type": ["string", "null"]}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"selected_anthropic": {"const": false}}},
+          "then": {"properties": {"override_reason": {"type": "string", "minLength": 1}}},
+          "else": {"properties": {"override_reason": {"type": "null"}}}
+        }
+      ]
+    },
+    "candidates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["skill", "source", "provenance_url", "installed", "enabled", "review_status", "runtime_compatible", "contract_fit", "quality_evidence", "risks"],
+        "properties": {
+          "skill": {"type": "string", "minLength": 1, "not": {"enum": ["anthropic-pptx"]}},
+          "source": {"enum": ["owner_designated", "owner_anthropic_bundle", "anthropic_official", "installed_reviewed", "ouroboroshub_official", "other_reviewed"]},
+          "provenance_url": {"type": "string", "minLength": 1},
+          "installed": {"type": "boolean"},
+          "enabled": {"type": "boolean"},
+          "review_status": {"enum": ["clean", "warnings", "pending", "stale", "not_installed", "blocked"]},
+          "runtime_compatible": {"type": "boolean"},
+          "contract_fit": {"type": "integer", "minimum": 0, "maximum": 100},
+          "quality_evidence": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+          "risks": {"type": "array", "items": {"type": "string", "minLength": 1}}
+        }
+      }
+    },
+    "status": {"enum": ["selected", "approval_required", "blocked"]},
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["selected_skill", "reason", "rejected_alternatives", "next_action"],
+      "properties": {
+        "selected_skill": {"type": ["string", "null"], "not": {"enum": ["anthropic-pptx"]}},
+        "reason": {"type": "string", "minLength": 1},
+        "rejected_alternatives": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "next_action": {"enum": ["execute", "request_install_approval", "report_capability_gap"]}
+      }
+    },
+    "owner_approval_required": {"type": "boolean"}
+  }
+}

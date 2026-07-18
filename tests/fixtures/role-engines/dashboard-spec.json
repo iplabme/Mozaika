@@ -1,0 +1,84 @@
+{
+  "contract_version": "mozaika-dashboard-spec/v1",
+  "surface_policy": "separate-dashboard-and-storytelling-cards",
+  "title": "Динамика показателей",
+  "subtitle": "Проверка Node-рендера Mozaika",
+  "output_language": "ru",
+  "design_system": {
+    "authority": "owner_brandbook",
+    "manifest_path": "data/brandbook/mozaika/manifest.json",
+    "manifest_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "tokens_path": "data/brandbook/mozaika/tokens.css",
+    "reference_ids": ["anthropic-economic-index-dashboard"],
+    "instruction": "Брендбук Mozaika — источник правды для дизайна. Реализуй именно его композицию, токены и паттерны для данного типа артефакта. Встроенные темы renderer запрещены, если владелец явно не переопределил брендбук."
+  },
+  "generated_at": "2026-07-13T09:00:00Z",
+  "research_title_verbatim": null,
+  "research_questions": [],
+  "owner_question": "Какой способ рассказа лучше подходит руководителю?",
+  "recommended_option_id": "growth",
+  "kpis": [
+    {"label": "Сумма", "value": "57", "delta": "+7", "status": "good", "claim_ids": ["claim-total"]}
+  ],
+  "filters": [
+    {"id": "category-filter", "label": "Категория", "field": "category", "all_label": "Все категории"}
+  ],
+  "charts": [
+    {
+      "id": "category-total",
+      "type": "interval",
+      "title": "Категория А лидирует по сумме",
+      "data": [{"category": "А", "value": 30}, {"category": "Б", "value": 27}],
+      "encode": {"x": "category", "y": "value"},
+      "claim_ids": ["claim-category"]
+    }
+  ],
+  "tables": [
+    {
+      "id": "category-table",
+      "title": "Значения по категориям",
+      "columns": [
+        {"key": "category", "label": "Категория", "format": "text", "sortable": true},
+        {"key": "value", "label": "Сумма", "format": "number", "sortable": true}
+      ],
+      "rows": [{"category": "А", "value": 30}, {"category": "Б", "value": 27}],
+      "searchable": true,
+      "page_size": 10,
+      "claim_ids": ["claim-category"]
+    }
+  ],
+  "customization": {"allow_section_visibility": true, "allow_density": true, "allow_table_search": true, "allow_reset": true},
+  "insights": [
+    {"title": "Разрыв невелик", "body": "Категории отличаются на три единицы.", "severity": "neutral", "claim_ids": ["claim-category"]}
+  ],
+  "caveats": ["Небольшая тестовая выборка."],
+  "storytelling_cards": [
+    {
+      "option_id": "growth",
+      "headline": "Сосредоточиться на росте А",
+      "core_message": "Категория А показывает лучший итог.",
+      "why_it_matters": "Это помогает выбрать приоритет анализа.",
+      "story_beats": [
+        {"sequence": 1, "title": "База", "message": "Сравниваем одинаковые периоды."},
+        {"sequence": 2, "title": "Разрыв", "message": "А опережает Б."},
+        {"sequence": 3, "title": "Действие", "message": "Проверяем устойчивость преимущества."}
+      ],
+      "executive_takeaway": "Проверить причины результата А.",
+      "claim_ids": ["claim-category"]
+    },
+    {
+      "option_id": "balance",
+      "headline": "Сосредоточиться на близости результатов",
+      "core_message": "Разница между категориями невелика.",
+      "why_it_matters": "Решение не должно опираться на случайный разрыв.",
+      "story_beats": [
+        {"sequence": 1, "title": "База", "message": "Суммы сопоставимы."},
+        {"sequence": 2, "title": "Риск", "message": "Разрыв может быть нестабилен."},
+        {"sequence": 3, "title": "Действие", "message": "Нужна проверка на новых периодах."}
+      ],
+      "executive_takeaway": "Не менять приоритет без дополнительной проверки.",
+      "claim_ids": ["claim-category"]
+    }
+  ],
+  "sources": ["sample.csv"]
+}

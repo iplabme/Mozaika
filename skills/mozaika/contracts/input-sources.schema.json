@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mozaika.local/contracts/input-sources-v2.schema.json",
+  "title": "mozaika-input-sources/v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "sources"],
+  "properties": {
+    "contract_version": {"const": "mozaika-input-sources/v2"},
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 50,
+      "items": {"$ref": "#/$defs/source"}
+    }
+  },
+  "$defs": {
+    "stored_file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id", "original_name", "relative_path", "stored_path", "size_bytes", "sha256", "mime", "artifact_kind", "preservation"],
+      "properties": {
+        "source_id": {"type": "string", "pattern": "^source-[0-9]{2}$"},
+        "original_name": {"type": "string", "minLength": 1},
+        "relative_path": {"type": "string", "minLength": 1},
+        "stored_path": {"type": "string", "minLength": 1},
+        "size_bytes": {"type": "integer", "minimum": 0},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "mime": {"type": "string", "minLength": 1},
+        "artifact_kind": {"const": "user_input"},
+        "preservation": {"const": "append_only"}
+      }
+    },
+    "source": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source_id", "kind", "display_name", "url", "fetch_status"],
+          "properties": {
+            "source_id": {"type": "string", "pattern": "^source-[0-9]{2}$"},
+            "kind": {"const": "url"},
+            "display_name": {"type": "string", "minLength": 1},
+            "url": {"type": "string", "pattern": "^https?://"},
+            "fetch_status": {"const": "pending_data_stage"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source_id", "kind", "display_name", "path", "entry_type", "size_bytes", "selection_token", "selection_receipt", "copy_status", "preservation"],
+          "properties": {
+            "source_id": {"type": "string", "pattern": "^source-[0-9]{2}$"},
+            "kind": {"const": "local_path"},
+            "display_name": {"type": "string", "minLength": 1},
+            "path": {"type": "string", "minLength": 1},
+            "entry_type": {"enum": ["file", "directory"]},
+            "size_bytes": {"type": ["integer", "null"], "minimum": 0},
+            "selection_token": {"type": "string", "pattern": "^[a-f0-9]{32}$"},
+            "selection_receipt": {"type": "string", "minLength": 1},
+            "copy_status": {"const": "pending_data_stage"},
+            "preservation": {"const": "reference_only"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source_id", "kind", "display_name", "file"],
+          "properties": {
+            "source_id": {"type": "string", "pattern": "^source-[0-9]{2}$"},
+            "kind": {"const": "file"},
+            "display_name": {"type": "string", "minLength": 1},
+            "file": {"$ref": "#/$defs/stored_file"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source_id", "kind", "display_name", "file_count", "size_bytes", "files"],
+          "properties": {
+            "source_id": {"type": "string", "pattern": "^source-[0-9]{2}$"},
+            "kind": {"const": "directory"},
+            "display_name": {"type": "string", "minLength": 1},
+            "file_count": {"type": "integer", "minimum": 1, "maximum": 500},
+            "size_bytes": {"type": "integer", "minimum": 0},
+            "files": {"type": "array", "minItems": 1, "maxItems": 500, "items": {"$ref": "#/$defs/stored_file"}}
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mozaika.local/contracts/owner-choice-v1.schema.json",
+  "title": "mozaika-owner-choice/v1 HTML storytelling cards payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "run_id", "decision_id", "question", "recommended_option_id", "options", "blocking_stage", "output_language", "scope_ledger_sha256", "claim_registry_sha256", "visual_preview_required", "owner_surface_format", "dashboard_surface_artifact_id", "owner_surface_artifact_id"],
+  "properties": {
+    "contract_version": {"const": "mozaika-owner-choice/v1"},
+    "run_id": {"type": "string", "minLength": 1},
+    "decision_id": {"type": "string", "minLength": 1},
+    "question": {"type": "string", "minLength": 1},
+    "recommended_option_id": {"type": "string", "minLength": 1},
+    "blocking_stage": {"type": "string", "minLength": 1},
+    "output_language": {"type": "string", "minLength": 2},
+    "scope_ledger_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "claim_registry_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "visual_preview_required": {"const": true},
+    "owner_surface_format": {"const": "html"},
+    "dashboard_surface_artifact_id": {"type": "string", "minLength": 1},
+    "owner_surface_artifact_id": {"type": "string", "minLength": 1},
+    "research_brief_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "required_requirement_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^req-[a-z0-9][a-z0-9_-]{0,63}$"}},
+    "narrative_integrity_audit_artifact_id": {"type": "string", "minLength": 1},
+    "checkpoint_artifact_id": {"type": "string", "minLength": 1},
+    "options": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["option_id", "label", "grouping_principle", "governing_thought", "consequences", "claim_ids", "preview_artifact_id", "html_anchor", "card"],
+        "properties": {
+          "option_id": {"type": "string", "minLength": 1},
+          "label": {"type": "string", "minLength": 1},
+          "grouping_principle": {"type": "string", "minLength": 1},
+          "governing_thought": {"type": "string", "minLength": 1},
+          "consequences": {"type": "string", "minLength": 1},
+          "claim_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "preview_artifact_id": {"type": "string", "minLength": 1},
+          "html_anchor": {"type": "string", "pattern": "^#[A-Za-z][A-Za-z0-9_-]*$"},
+          "requirements_coverage": {"type": "array", "minItems": 1, "maxItems": 100, "items": {"$ref": "#/$defs/requirement_coverage"}},
+          "card": {"$ref": "#/$defs/storytelling_card"}
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"required": ["research_brief_sha256"]},
+      "then": {
+        "required": ["research_brief_sha256", "required_requirement_ids", "narrative_integrity_audit_artifact_id", "checkpoint_artifact_id"],
+        "properties": {
+          "options": {
+            "items": {"required": ["requirements_coverage"]}
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "requirement_coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requirement_id", "text_verbatim", "status", "beat_sequences", "claim_ids", "planned_screen_intents", "framing"],
+      "properties": {
+        "requirement_id": {"type": "string", "pattern": "^req-[a-z0-9][a-z0-9_-]{0,63}$"},
+        "text_verbatim": {"type": "string", "minLength": 1, "maxLength": 2000},
+        "status": {"enum": ["covered", "partial", "unanswered", "applied_global"]},
+        "beat_sequences": {"type": "array", "maxItems": 5, "uniqueItems": true, "items": {"type": "integer", "minimum": 1, "maximum": 5}},
+        "claim_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "planned_screen_intents": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "framing": {"type": "string", "minLength": 3, "maxLength": 1000}
+      }
+    },
+    "storytelling_card": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["headline", "core_message", "why_it_matters", "story_beats", "executive_takeaway", "visual_style", "preview_alt_text", "language"],
+      "properties": {
+        "headline": {"type": "string", "minLength": 5, "maxLength": 90},
+        "core_message": {"type": "string", "minLength": 10, "maxLength": 240},
+        "why_it_matters": {"type": "string", "minLength": 10, "maxLength": 240},
+        "executive_takeaway": {"type": "string", "minLength": 10, "maxLength": 240},
+        "visual_style": {"type": "string", "minLength": 3, "maxLength": 120},
+        "preview_alt_text": {"type": "string", "minLength": 10, "maxLength": 300},
+        "language": {"type": "string", "minLength": 2},
+        "story_beats": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["sequence", "title", "message", "claim_ids", "visual_hint"],
+            "properties": {
+              "sequence": {"type": "integer", "minimum": 1, "maximum": 5},
+              "title": {"type": "string", "minLength": 2, "maxLength": 70},
+              "message": {"type": "string", "minLength": 5, "maxLength": 180},
+              "claim_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+              "visual_hint": {"type": "string", "minLength": 3, "maxLength": 120}
+            }
+          }
+        }
+      }
+    }
+  }
+}

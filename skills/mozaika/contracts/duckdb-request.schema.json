@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mozaika.local/contracts/duckdb-request.schema.json",
+  "title": "mozaika-duckdb-request/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "output", "sources", "queries"],
+  "properties": {
+    "contract_version": {"const": "mozaika-duckdb-request/v1"},
+    "output": {"type": "string", "minLength": 1},
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_id", "location", "format"],
+        "properties": {
+          "source_id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]{0,62}$"},
+          "location": {"type": "string", "minLength": 1},
+          "format": {"enum": ["csv", "tsv", "json", "jsonl", "parquet"]}
+        }
+      }
+    },
+    "queries": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["query_id", "sql"],
+        "properties": {
+          "query_id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"},
+          "sql": {"type": "string", "minLength": 1, "maxLength": 50000}
+        }
+      }
+    }
+  }
+}

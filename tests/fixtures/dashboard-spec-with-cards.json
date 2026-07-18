@@ -1,0 +1,86 @@
+{
+  "contract_version": "mozaika-dashboard-spec/v1",
+  "surface_policy": "separate-dashboard-and-storytelling-cards",
+  "title": "Проверка HTML-карточек",
+  "subtitle": "Два способа рассказать руководителю об одних и тех же фактах",
+  "output_language": "ru",
+  "design_system": {
+    "authority": "owner_brandbook",
+    "manifest_path": "data/brandbook/mozaika/manifest.json",
+    "manifest_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "tokens_path": "data/brandbook/mozaika/tokens.css",
+    "reference_ids": ["anthropic-economic-index-dashboard", "anthropic-transparency-hub-cards"],
+    "instruction": "Брендбук Mozaika — источник правды для дизайна. Реализуй именно его композицию, токены и паттерны для данного типа артефакта. Встроенные темы renderer запрещены, если владелец явно не переопределил брендбук."
+  },
+  "generated_at": "2026-07-14T12:00:00Z",
+  "research_title_verbatim": "Проверка HTML-карточек",
+  "research_questions": [
+    {"text_verbatim": "Как распределяется показатель между вариантами?", "finding": "Вариант A формирует 64%, вариант B — 36%.", "status": "answered", "claim_ids": ["claim-share"]}
+  ],
+  "owner_question": "Какой вариант истории лучше отвечает вашей задаче?",
+  "recommended_option_id": "focus",
+  "kpis": [
+    {"label": "Показатель", "value": "64%", "status": "good", "claim_ids": ["claim-share"]}
+  ],
+  "filters": [
+    {"id": "variant-filter", "label": "Вариант", "field": "name", "all_label": "Все варианты"}
+  ],
+  "charts": [
+    {
+      "id": "comparison",
+      "type": "interval",
+      "title": "Сравнение",
+      "data": [{"name": "A", "value": 64}, {"name": "B", "value": 36}],
+      "encode": {"x": "name", "y": "value"},
+      "claim_ids": ["claim-share"]
+    }
+  ],
+  "tables": [
+    {
+      "id": "variant-table",
+      "title": "Данные сравнения",
+      "columns": [
+        {"key": "name", "label": "Вариант", "format": "text", "sortable": true},
+        {"key": "value", "label": "Показатель", "format": "number", "sortable": true}
+      ],
+      "rows": [{"name": "A", "value": 64}, {"name": "B", "value": 36}],
+      "searchable": true,
+      "page_size": 10,
+      "claim_ids": ["claim-share"]
+    }
+  ],
+  "customization": {"allow_section_visibility": true, "allow_density": true, "allow_table_search": true, "allow_reset": true},
+  "insights": [
+    {"title": "Наблюдение", "body": "Варианты используют одинаковую доказательную базу.", "severity": "neutral", "claim_ids": ["claim-share"]}
+  ],
+  "caveats": ["Тестовая спецификация проверяет формат, а не бизнес-вывод."],
+  "storytelling_cards": [
+    {
+      "option_id": "focus",
+      "headline": "Проверка HTML-карточек — Сфокусироваться на лидере",
+      "core_message": "Показать масштаб преимущества и цену зависимости от одного решения.",
+      "why_it_matters": "Руководитель быстро увидит главный выбор и связанный с ним риск.",
+      "story_beats": [
+        {"sequence": 1, "title": "Масштаб", "message": "Начать с доли лидера."},
+        {"sequence": 2, "title": "Причина", "message": "Показать устойчивость преимущества."},
+        {"sequence": 3, "title": "Решение", "message": "Предложить управляемое хеджирование."}
+      ],
+      "executive_takeaway": "Сохранить основную ставку и заранее ограничить концентрационный риск.",
+      "claim_ids": ["claim-share"]
+    },
+    {
+      "option_id": "portfolio",
+      "headline": "Проверка HTML-карточек — Собрать портфель сильных сторон",
+      "core_message": "Показать, что разные решения выигрывают в разных классах задач.",
+      "why_it_matters": "Руководитель увидит практическую логику распределения задач.",
+      "story_beats": [
+        {"sequence": 1, "title": "Сегменты", "message": "Разделить задачи на понятные группы."},
+        {"sequence": 2, "title": "Победители", "message": "Назвать лидера в каждой группе."},
+        {"sequence": 3, "title": "Архитектура", "message": "Связать наблюдения с портфельным решением."}
+      ],
+      "executive_takeaway": "Маршрутизировать задачи по сильным сторонам и не зависеть от одного поставщика.",
+      "claim_ids": ["claim-share"]
+    }
+  ],
+  "sources": ["Тестовый источник"]
+}

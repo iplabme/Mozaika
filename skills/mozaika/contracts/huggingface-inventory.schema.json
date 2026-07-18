@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mozaika.local/contracts/huggingface-inventory.schema.json",
+  "title": "mozaika-huggingface-inventory/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "generated_at", "source", "coverage", "repository_files", "parquet_children", "provenance"],
+  "properties": {
+    "contract_version": {"const": "mozaika-huggingface-inventory/v1"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "source": {"type": "object", "required": ["provider", "dataset_id", "requested_revision", "canonical_url", "private", "gated"], "properties": {"provider": {"const": "huggingface"}, "dataset_id": {"type": "string", "minLength": 3}, "requested_revision": {"type": "string", "minLength": 1}, "resolved_commit_sha": {"type": ["string", "null"]}, "canonical_url": {"type": "string", "format": "uri"}, "private": {"type": "boolean"}, "gated": {}}, "additionalProperties": false},
+    "coverage": {"type": "object", "required": ["repository_files", "parquet_children", "parquet_status", "parquet_pending", "parquet_failed"], "properties": {"repository_files": {"type": "integer", "minimum": 0}, "parquet_children": {"type": "integer", "minimum": 0}, "parquet_status": {"enum": ["available", "unavailable"]}, "parquet_pending": {"type": "array"}, "parquet_failed": {"type": "array"}}, "additionalProperties": false},
+    "repository_files": {"type": "array", "items": {"type": "object", "required": ["child_id", "kind", "path", "size_bytes", "blob_id", "lfs_sha256"], "properties": {"child_id": {"type": "string"}, "kind": {"const": "repository_file"}, "path": {"type": "string", "minLength": 1}, "size_bytes": {"type": ["integer", "null"]}, "blob_id": {"type": ["string", "null"]}, "lfs_sha256": {"type": ["string", "null"]}}, "additionalProperties": false}},
+    "parquet_children": {"type": "array", "items": {"type": "object", "required": ["child_id", "kind", "config", "split", "url", "filename", "size_bytes"], "properties": {"child_id": {"type": "string"}, "kind": {"const": "parquet_conversion"}, "config": {"type": ["string", "null"]}, "split": {"type": ["string", "null"]}, "url": {"type": "string", "format": "uri"}, "filename": {"type": ["string", "null"]}, "size_bytes": {"type": ["integer", "null"]}}, "additionalProperties": false}},
+    "provenance": {"type": "object", "required": ["metadata_api", "parquet_api"], "properties": {"metadata_api": {"type": "string", "format": "uri"}, "parquet_api": {"type": "string", "format": "uri"}}, "additionalProperties": false}
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "title": "Заголовок из принятой HTML-презентации",
+  "subtitle": "Период и охват",
+  "template_usage": {
+    "mode": "visual-grammar-only",
+    "reference_id": "scenario-insight-ds-role-analytics-pptx",
+    "reference_sha256": "66430f7a96d66546eaa6c9fd8fad971e925a40c09ce2e2ae91047f16263a6c1d",
+    "instruction": "Сначала полностью замени slides последовательностью принятой HTML-презентации. Не копируй число, порядок, темы или данные слайдов референса; используй только его цвета, элементы и правила размещения."
+  },
+  "deck_style": {
+    "visual_density": "medium",
+    "page_system": "lab-plate",
+    "header_mode": "lab-clean",
+    "header_variant": "auto",
+    "header_variants": ["split-rule", "title-rule", "side-rail", "top-bottom-rule", "plain"],
+    "title_layout": "split-hero",
+    "title_motif": "orbit",
+    "cards_mode": "staggered-row",
+    "chart_treatment": "facts-below",
+    "table_treatment": "compact-ledger",
+    "footer_mode": "source-line",
+    "summary_callout_mode": "lab-box",
+    "image_sidebar_mode": "analysis-rail",
+    "comparison_mode": "scorecard",
+    "style_seed": "mozaika-insight-v1"
+  },
+  "slides": [
+    {
+      "type": "title",
+      "title": "Заголовок из принятой HTML-презентации",
+      "subtitle": "Подзаголовок из принятой HTML-презентации",
+      "footer": "Источник и период"
+    },
+    {
+      "type": "content",
+      "variant": "standard",
+      "title": "Заменить следующим слайдом принятой HTML-презентации",
+      "body": "Это пример размещения, а не обязательный слайд.",
+      "footer": "Источник и методика"
+    }
+  ]
+}

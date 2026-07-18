@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mozaika.local/contracts/scope-ledger-v1.schema.json",
+  "title": "mozaika-scope-ledger/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "run_id", "source_kind", "requested_mode", "enumeration_artifact_ids", "scope_change_approved", "items", "coverage"],
+  "properties": {
+    "contract_version": {"const": "mozaika-scope-ledger/v1"},
+    "run_id": {"type": "string", "minLength": 1},
+    "source_kind": {"enum": ["single", "collection"]},
+    "requested_mode": {"enum": ["all", "selected"]},
+    "enumeration_artifact_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "scope_change_approved": {"type": "boolean"},
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_id", "uri", "disposition", "artifact_ids"],
+        "properties": {
+          "source_id": {"type": "string", "minLength": 1},
+          "uri": {"type": "string", "minLength": 1},
+          "disposition": {"enum": ["analyzed", "owner_excluded", "blocked"]},
+          "artifact_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "row_count": {"type": "integer", "minimum": 0},
+          "reason": {"type": "string", "minLength": 1},
+          "decision_id": {"type": "string", "minLength": 1}
+        },
+        "allOf": [
+          {"if": {"properties": {"disposition": {"const": "analyzed"}}}, "then": {"properties": {"artifact_ids": {"minItems": 1}}}},
+          {"if": {"properties": {"disposition": {"const": "owner_excluded"}}}, "then": {"required": ["reason", "decision_id"]}},
+          {"if": {"properties": {"disposition": {"const": "blocked"}}}, "then": {"required": ["reason"]}}
+        ]
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total", "analyzed", "owner_excluded", "blocked", "all_analyzed", "terminal_complete", "solved_coverage"],
+      "properties": {
+        "total": {"type": "integer", "minimum": 1},
+        "analyzed": {"type": "integer", "minimum": 0},
+        "owner_excluded": {"type": "integer", "minimum": 0},
+        "blocked": {"type": "integer", "minimum": 0},
+        "all_analyzed": {"type": "boolean"},
+        "terminal_complete": {"type": "boolean"},
+        "solved_coverage": {"type": "boolean"}
+      }
+    }
+  },
+  "allOf": [
+    {"if": {"properties": {"source_kind": {"const": "collection"}}}, "then": {"properties": {"enumeration_artifact_ids": {"minItems": 1}}}}
+  ]
+}

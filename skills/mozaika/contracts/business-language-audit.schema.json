@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mozaika.local/contracts/business-language-audit-v1.schema.json",
+  "title": "mozaika-business-language-audit/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "run_id", "audit_id", "artifact_type", "artifact_id", "artifact_sha256", "assignment_artifact_id", "assignment_sha256", "output_language", "protected_verbatim", "passes", "checks", "issues", "status"],
+  "properties": {
+    "contract_version": {"const": "mozaika-business-language-audit/v1"},
+    "run_id": {"type": "string", "minLength": 1},
+    "audit_id": {"type": "string", "minLength": 1},
+    "artifact_type": {"enum": ["dashboard", "storytelling_cards", "selected_storytelling_card", "presentation", "speaker_story_cards"]},
+    "artifact_id": {"type": "string", "minLength": 1},
+    "artifact_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "assignment_artifact_id": {"type": "string", "minLength": 1},
+    "assignment_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "output_language": {"type": "string", "minLength": 2},
+    "protected_verbatim": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "text", "source_ref", "found_unchanged"],
+        "properties": {
+          "kind": {"enum": ["owner_supplied_title", "research_title_verbatim", "research_question_verbatim", "explicit_prompt_point", "official_name", "direct_quote", "required_legal_text"]},
+          "text": {"type": "string", "minLength": 1},
+          "source_ref": {"type": "string", "minLength": 1},
+          "found_unchanged": {"type": "boolean"}
+        }
+      }
+    },
+    "passes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["free_headings", "body_text"],
+      "properties": {
+        "free_headings": {"$ref": "#/$defs/pass_result"},
+        "body_text": {"$ref": "#/$defs/pass_result"}
+      }
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protected_extraction_complete", "protected_verbatim_unchanged", "meaning_recoverable", "no_material_misrepresentation", "no_grossly_offensive_or_hostile_tone", "no_service_metadata_leak", "critical_only_failures_blocked", "pass_when_uncertain"],
+      "properties": {
+        "protected_extraction_complete": {"type": "boolean"},
+        "protected_verbatim_unchanged": {"type": "boolean"},
+        "meaning_recoverable": {"type": "boolean"},
+        "no_material_misrepresentation": {"type": "boolean"},
+        "no_grossly_offensive_or_hostile_tone": {"type": "boolean"},
+        "no_service_metadata_leak": {"type": "boolean"},
+        "critical_only_failures_blocked": {"const": true},
+        "pass_when_uncertain": {"const": true}
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["pass", "location", "original_text", "failure_class", "why_blocking", "suggested_rewrite", "claim_ids", "protected_conflict"],
+        "properties": {
+          "pass": {"enum": ["free_headings", "body_text"]},
+          "location": {"type": "string", "minLength": 1},
+          "original_text": {"type": "string", "minLength": 1},
+          "failure_class": {"enum": ["protected_verbatim_changed", "meaning_blocking_corruption", "materially_misleading_or_unsupported_claim", "grossly_offensive_or_hostile_tone", "service_metadata_leak"]},
+          "why_blocking": {"type": "string", "minLength": 1},
+          "suggested_rewrite": {"type": "string", "minLength": 1},
+          "claim_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "protected_conflict": {"type": "boolean"}
+        },
+        "allOf": [
+          {
+            "if": {"properties": {"failure_class": {"const": "protected_verbatim_changed"}}, "required": ["failure_class"]},
+            "then": {"properties": {"protected_conflict": {"const": true}}},
+            "else": {"properties": {"protected_conflict": {"const": false}}}
+          }
+        ]
+      }
+    },
+    "status": {"enum": ["pass", "revise"]}
+  },
+  "$defs": {
+    "pass_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["items_checked", "protected_items_skipped", "blocking_failure_count"],
+      "properties": {
+        "items_checked": {"type": "integer", "minimum": 0},
+        "protected_items_skipped": {"type": "integer", "minimum": 0},
+        "blocking_failure_count": {"type": "integer", "minimum": 0}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "pass"}}, "required": ["status"]},
+      "then": {
+        "properties": {
+          "issues": {"maxItems": 0},
+          "protected_verbatim": {"items": {"properties": {"found_unchanged": {"const": true}}}},
+          "passes": {
+            "properties": {
+              "free_headings": {"properties": {"blocking_failure_count": {"const": 0}}},
+              "body_text": {"properties": {"blocking_failure_count": {"const": 0}}}
+            }
+          },
+          "checks": {
+            "properties": {
+              "protected_extraction_complete": {"const": true},
+              "protected_verbatim_unchanged": {"const": true},
+              "meaning_recoverable": {"const": true},
+              "no_material_misrepresentation": {"const": true},
+              "no_grossly_offensive_or_hostile_tone": {"const": true},
+              "no_service_metadata_leak": {"const": true}
+            }
+          }
+        }
+      },
+      "else": {"properties": {"issues": {"minItems": 1}}}
+    }
+  ]
+}

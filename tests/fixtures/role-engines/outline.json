@@ -1,0 +1,60 @@
+{
+  "contract_version": "presentation-outline/v1",
+  "title": "Тест Mozaika",
+  "research_title_verbatim": null,
+  "research_questions_coverage": [],
+  "subtitle": "Богатая HTML-презентация",
+  "output_language": "ru",
+  "renderer_skill": "anthropic-interactive-dashboard-builder",
+  "output_format": "html",
+  "delivery_mode": "self-contained-single-file",
+  "design_system": {
+    "authority": "owner_brandbook",
+    "manifest_path": "data/brandbook/mozaika/manifest.json",
+    "manifest_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "tokens_path": "data/brandbook/mozaika/tokens.css",
+    "reference_ids": ["anthropic-economic-index-report"],
+    "instruction": "Брендбук Mozaika — источник правды для дизайна. Реализуй именно его композицию, токены и паттерны для данного типа артефакта. Встроенные темы renderer запрещены, если владелец явно не переопределил брендбук."
+  },
+  "html_requirements": {
+    "slide_navigation": true,
+    "keyboard_navigation": true,
+    "fullscreen_mode": true,
+    "overview_mode": true,
+    "responsive_layout": true,
+    "interactive_charts": true,
+    "print_styles": true,
+    "accessible_semantics": true,
+    "reduced_motion_support": true,
+    "offline_assets": true
+  },
+  "scope_ledger_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "claim_registry_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "slides": [
+    {"type": "title", "title": "Тест Mozaika", "subtitle": "Богатая HTML-презентация"},
+    {
+      "type": "content",
+      "variant": "chart",
+      "title": "Категория А лидирует по сумме",
+      "claim_ids": ["claim-category"],
+      "chart": {
+        "type": "bar",
+        "categories": ["А", "Б"],
+        "series": [{"name": "Сумма", "labels": ["А", "Б"], "values": [30, 27]}],
+        "facts": [{"value": "57", "label": "Общая сумма"}]
+      },
+      "sources": ["sample.csv"]
+    },
+    {
+      "type": "content",
+      "variant": "cards-2",
+      "title": "Два вывода для руководителя",
+      "claim_ids": ["claim-category"],
+      "cards": [
+        {"title": "Лидер", "value": "А", "body": "Опережает Б на три единицы."},
+        {"title": "Оговорка", "value": "2", "body": "Периода недостаточно для тренда."}
+      ],
+      "takeaway": "Нужна проверка устойчивости результата."
+    }
+  ]
+}

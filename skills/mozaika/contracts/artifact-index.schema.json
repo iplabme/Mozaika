@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mozaika.local/contracts/artifact-index-v1.schema.json",
+  "title": "mozaika-artifact-index/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "run_id", "policy", "required_artifact_ids", "artifacts"],
+  "properties": {
+    "contract_version": {"const": "mozaika-artifact-index/v1"},
+    "run_id": {"type": "string", "minLength": 1},
+    "policy": {
+      "const": {
+        "mode": "append_only",
+        "preserve_user_inputs": true,
+        "preserve_stage_outputs": true,
+        "allow_delete": false
+      }
+    },
+    "required_artifact_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["artifact_id", "kind", "uri", "sha256", "media_type", "schema", "size_bytes", "created_at", "source_task_id", "source_stage_id", "preserved", "immutable", "durable", "owner_visible"],
+        "properties": {
+          "artifact_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+          "kind": {"enum": ["user_input", "source_inventory", "research_brief", "requirement_claim_map", "analysis", "dashboard", "owner_choice_preview", "owner_decision_checkpoint", "selected_storyline_card", "storyline", "presentation_outline", "presentation_source", "presentation", "pptx", "speaker_story_cards", "narrative_integrity_audit", "qa", "run_note"]},
+          "original_name": {"type": "string", "minLength": 1},
+          "uri": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "media_type": {"type": "string", "minLength": 1},
+          "schema": {"type": "string", "minLength": 1},
+          "size_bytes": {"type": "integer", "minimum": 0},
+          "created_at": {"type": "string", "format": "date-time"},
+          "source_task_id": {"type": "string", "minLength": 1},
+          "source_stage_id": {"type": "string", "minLength": 1},
+          "predecessor_artifact_id": {"type": "string", "minLength": 1},
+          "preserved": {"const": true},
+          "immutable": {"const": true},
+          "durable": {"const": true},
+          "owner_visible": {"type": "boolean"}
+        },
+        "allOf": [
+          {"if": {"properties": {"kind": {"const": "user_input"}}}, "then": {"required": ["original_name"]}}
+        ]
+      }
+    }
+  }
+}

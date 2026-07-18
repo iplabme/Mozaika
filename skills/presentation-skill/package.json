@@ -1,0 +1,9 @@
+{
+  "name": "presentation-skill",
+  "version": "0.1.0",
+  "description": "Adapted from siril9/presentation-skill — PptxGenJS renderer for Ouroboros",
+  "private": true,
+  "dependencies": {
+    "pptxgenjs": "^4.0.1"
+  }
+}

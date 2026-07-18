@@ -1,0 +1,1425 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://mozaika.local/contracts/presentation-outline-v1.schema.json",
+    "title": "presentation-outline/v1 for a rich self-contained HTML presentation",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "contract_version",
+        "title",
+        "research_title_verbatim",
+        "research_questions_coverage",
+        "output_language",
+        "renderer_skill",
+        "output_format",
+        "delivery_mode",
+        "design_system",
+        "html_requirements",
+        "scope_ledger_sha256",
+        "claim_registry_sha256",
+        "slides"
+    ],
+    "properties": {
+        "contract_version": {
+            "const": "presentation-outline/v1"
+        },
+        "scenario": {
+            "enum": ["routine_report", "insight_deck", "weekly_autopilot"]
+        },
+        "coverage_mode": {
+            "enum": ["fixed_template", "frozen_requirements"]
+        },
+        "provenance": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["research_brief_sha256", "storyline_artifact_id", "selected_checkpoint_id", "selected_card_artifact_id", "template_sha256"],
+            "properties": {
+                "research_brief_sha256": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+                "storyline_artifact_id": {"type": ["string", "null"], "minLength": 1},
+                "selected_checkpoint_id": {"type": ["string", "null"], "minLength": 1},
+                "selected_card_artifact_id": {"type": ["string", "null"], "minLength": 1},
+                "template_sha256": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"}
+            }
+        },
+        "title": {
+            "type": "string",
+            "minLength": 1
+        },
+        "research_title_verbatim": {
+            "type": ["string", "null"],
+            "minLength": 1,
+            "maxLength": 180
+        },
+        "research_questions_coverage": {
+            "type": "array",
+            "maxItems": 30,
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["text_verbatim", "status", "slide_titles", "claim_ids"],
+                "properties": {
+                    "text_verbatim": {"type": "string", "minLength": 1, "maxLength": 500},
+                    "requirement_id": {"type": "string", "pattern": "^req-[a-z0-9][a-z0-9_-]{0,63}$"},
+                    "status": {"enum": ["covered", "partial", "unanswered", "applied_global"]},
+                    "slide_titles": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+                    "slide_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^slide-[a-z0-9][a-z0-9_-]{0,63}$"}},
+                    "claim_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+                }
+            }
+        },
+        "subtitle": {
+            "type": "string"
+        },
+        "output_language": {
+            "type": "string",
+            "minLength": 2
+        },
+        "renderer_skill": {
+            "type": "string",
+            "minLength": 1,
+            "not": {
+                "enum": [
+                    "anthropic-pptx",
+                    "presentation-skill"
+                ]
+            }
+        },
+        "output_format": {
+            "const": "html"
+        },
+        "delivery_mode": {
+            "const": "self-contained-single-file"
+        },
+        "design_system": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["authority", "manifest_path", "manifest_sha256", "tokens_path", "reference_ids", "instruction"],
+            "properties": {
+                "authority": {"const": "owner_brandbook"},
+                "manifest_path": {"const": "data/brandbook/mozaika/manifest.json"},
+                "manifest_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+                "tokens_path": {"const": "data/brandbook/mozaika/tokens.css"},
+                "reference_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+                "instruction": {"const": "Брендбук Mozaika — источник правды для дизайна. Реализуй именно его композицию, токены и паттерны для данного типа артефакта. Встроенные темы renderer запрещены, если владелец явно не переопределил брендбук."}
+            }
+        },
+        "html_requirements": {
+            "$ref": "#/$defs/html_requirements"
+        },
+        "scope_ledger_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+        },
+        "claim_registry_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+        },
+        "deck_style": {
+            "$ref": "#/$defs/deck_style"
+        },
+        "compliance": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "attribution_file": {
+                    "type": "string"
+                },
+                "auto_image_sources": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "slides": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "$ref": "#/$defs/slide"
+            }
+        }
+    },
+    "allOf": [
+        {
+            "if": {"properties": {"scenario": {"const": "insight_deck"}}, "required": ["scenario"]},
+            "then": {
+                "required": ["coverage_mode", "provenance"],
+                "properties": {
+                    "coverage_mode": {"const": "frozen_requirements"},
+                    "provenance": {
+                        "properties": {
+                            "research_brief_sha256": {"type": "string"},
+                            "storyline_artifact_id": {"type": "string"},
+                            "selected_checkpoint_id": {"type": "string"},
+                            "selected_card_artifact_id": {"type": "string"},
+                            "template_sha256": {"type": "null"}
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "if": {"properties": {"scenario": {"const": "routine_report"}}, "required": ["scenario"]},
+            "then": {
+                "required": ["coverage_mode", "provenance"],
+                "properties": {
+                    "coverage_mode": {"const": "fixed_template"},
+                    "provenance": {
+                        "properties": {
+                            "research_brief_sha256": {"type": "null"},
+                            "storyline_artifact_id": {"type": "null"},
+                            "selected_checkpoint_id": {"type": "null"},
+                            "selected_card_artifact_id": {"type": "null"},
+                            "template_sha256": {"type": "string"}
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "if": {"properties": {"scenario": {"const": "weekly_autopilot"}}, "required": ["scenario"]},
+            "then": {
+                "required": ["coverage_mode", "provenance"],
+                "properties": {
+                    "coverage_mode": {"const": "fixed_template"},
+                    "provenance": {
+                        "properties": {
+                            "research_brief_sha256": {"type": ["string", "null"]},
+                            "storyline_artifact_id": {"type": "null"},
+                            "selected_checkpoint_id": {"type": "null"},
+                            "selected_card_artifact_id": {"type": "null"},
+                            "template_sha256": {"type": "string"}
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "$defs": {
+        "html_requirements": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "slide_navigation",
+                "keyboard_navigation",
+                "fullscreen_mode",
+                "overview_mode",
+                "responsive_layout",
+                "interactive_charts",
+                "print_styles",
+                "accessible_semantics",
+                "reduced_motion_support",
+                "offline_assets"
+            ],
+            "properties": {
+                "slide_navigation": {"const": true},
+                "keyboard_navigation": {"const": true},
+                "fullscreen_mode": {"const": true},
+                "overview_mode": {"const": true},
+                "responsive_layout": {"const": true},
+                "interactive_charts": {"const": true},
+                "print_styles": {"const": true},
+                "accessible_semantics": {"const": true},
+                "reduced_motion_support": {"const": true},
+                "offline_assets": {"const": true}
+            }
+        },
+        "string_or_number": {
+            "type": [
+                "string",
+                "number"
+            ]
+        },
+        "deck_style": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "visual_density": {
+                    "enum": [
+                        "low",
+                        "medium",
+                        "high"
+                    ]
+                },
+                "page_system": {
+                    "enum": [
+                        "clinical-rail",
+                        "board-ledger",
+                        "editorial-field",
+                        "command-canvas",
+                        "lab-plate",
+                        "investor-thesis",
+                        "none"
+                    ]
+                },
+                "header_mode": {
+                    "enum": [
+                        "bar",
+                        "stack",
+                        "eyebrow",
+                        "lab-clean",
+                        "lab-card"
+                    ]
+                },
+                "header_variant": {
+                    "enum": [
+                        "auto",
+                        "left-accent",
+                        "split-rule",
+                        "title-rule",
+                        "side-rail",
+                        "top-bottom-rule",
+                        "plain"
+                    ]
+                },
+                "header_variants": {
+                    "type": "array",
+                    "items": {
+                        "enum": [
+                            "auto",
+                            "left-accent",
+                            "split-rule",
+                            "title-rule",
+                            "side-rail",
+                            "top-bottom-rule",
+                            "plain"
+                        ]
+                    }
+                },
+                "title_layout": {
+                    "enum": [
+                        "split-hero",
+                        "lab-plate",
+                        "command-center",
+                        "poster",
+                        "masthead",
+                        "light-atlas"
+                    ]
+                },
+                "title_motif": {
+                    "enum": [
+                        "orbit",
+                        "network",
+                        "editorial",
+                        "none"
+                    ]
+                },
+                "section_motif": {
+                    "enum": [
+                        "rail-dots",
+                        "numbered-tabs",
+                        "plain",
+                        "none"
+                    ]
+                },
+                "timeline_mode": {
+                    "enum": [
+                        "rail-cards",
+                        "staggered",
+                        "open-events",
+                        "bands",
+                        "chapter-spread"
+                    ]
+                },
+                "matrix_mode": {
+                    "enum": [
+                        "cards",
+                        "open-quadrants"
+                    ]
+                },
+                "stats_mode": {
+                    "enum": [
+                        "tiles",
+                        "feature-left",
+                        "policy-bands"
+                    ]
+                },
+                "cards_mode": {
+                    "enum": [
+                        "feature-left",
+                        "staggered-row"
+                    ]
+                },
+                "chart_treatment": {
+                    "enum": [
+                        "standard",
+                        "facts-below",
+                        "facts-right",
+                        "minimal",
+                        "hero-stat",
+                        "threshold-band",
+                        "sparse-wide"
+                    ]
+                },
+                "table_treatment": {
+                    "enum": [
+                        "standard",
+                        "compact-ledger",
+                        "readout-sidecar",
+                        "decision-matrix",
+                        "journal-grid"
+                    ]
+                },
+                "footer_mode": {
+                    "enum": [
+                        "standard",
+                        "source-line",
+                        "none"
+                    ]
+                },
+                "summary_callout_mode": {
+                    "enum": [
+                        "default",
+                        "lab-box"
+                    ]
+                },
+                "figure_table_treatment": {
+                    "enum": [
+                        "figure-first",
+                        "table-first",
+                        "stats-strip",
+                        "image-sidebar"
+                    ]
+                },
+                "image_sidebar_mode": {
+                    "enum": [
+                        "analysis-rail",
+                        "evidence-mosaic",
+                        "editorial-atlas"
+                    ]
+                },
+                "comparison_mode": {
+                    "enum": [
+                        "open-columns",
+                        "scorecard"
+                    ]
+                },
+                "palette_key": {
+                    "type": "string"
+                },
+                "font_pair": {
+                    "type": "string"
+                },
+                "header_rule_color": {
+                    "type": "string"
+                },
+                "style_seed": {
+                    "type": "string"
+                },
+                "footer_source_label": {
+                    "type": "string"
+                },
+                "footer_refs_label": {
+                    "type": "string"
+                },
+                "footer_page_numbers": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "bullet": {
+            "oneOf": [
+                {
+                    "type": "string",
+                    "minLength": 1
+                },
+                {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "required": [
+                        "text"
+                    ],
+                    "properties": {
+                        "text": {
+                            "type": "string",
+                            "minLength": 1
+                        }
+                    }
+                }
+            ]
+        },
+        "card": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "body": {
+                    "type": "string"
+                },
+                "value": {
+                    "$ref": "#/$defs/string_or_number"
+                },
+                "label": {
+                    "type": "string"
+                }
+            }
+        },
+        "fact": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": [
+                "value",
+                "label"
+            ],
+            "properties": {
+                "value": {
+                    "$ref": "#/$defs/string_or_number"
+                },
+                "label": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "context": {
+                    "type": "string"
+                }
+            }
+        },
+        "table": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": [
+                "headers",
+                "rows"
+            ],
+            "properties": {
+                "title": {
+                    "type": "string"
+                },
+                "headers": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/$defs/string_or_number"
+                    }
+                },
+                "rows": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                            "$ref": "#/$defs/string_or_number"
+                        }
+                    }
+                },
+                "column_weights": {
+                    "type": "array",
+                    "items": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                    }
+                },
+                "caption": {
+                    "type": "string"
+                },
+                "footnotes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "chart_series": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "name",
+                "values"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "labels": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "values": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "number"
+                    }
+                }
+            }
+        },
+        "chart_series_with_labels": {
+            "allOf": [
+                {
+                    "$ref": "#/$defs/chart_series"
+                },
+                {
+                    "required": [
+                        "labels"
+                    ]
+                }
+            ]
+        },
+        "chart": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": [
+                "type",
+                "series"
+            ],
+            "properties": {
+                "type": {
+                    "enum": [
+                        "bar",
+                        "line",
+                        "pie",
+                        "doughnut",
+                        "area",
+                        "column"
+                    ]
+                },
+                "slide_id": {
+                    "type": "string",
+                    "pattern": "^slide-[a-z0-9][a-z0-9_-]{0,63}$"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "subtitle": {
+                    "type": "string"
+                },
+                "categories": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "series": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/$defs/chart_series"
+                    }
+                },
+                "facts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/fact"
+                    }
+                },
+                "sources": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "options": {
+                    "type": "object"
+                }
+            },
+            "anyOf": [
+                {
+                    "required": [
+                        "categories"
+                    ]
+                },
+                {
+                    "properties": {
+                        "series": {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {
+                                "$ref": "#/$defs/chart_series_with_labels"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "assets": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+                "chart_data": {
+                    "$ref": "#/$defs/chart"
+                },
+                "chart": {
+                    "oneOf": [
+                        {
+                            "$ref": "#/$defs/chart"
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ]
+                },
+                "table": {
+                    "oneOf": [
+                        {
+                            "$ref": "#/$defs/table"
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ]
+                },
+                "tables": {
+                    "type": "array"
+                },
+                "icons": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "figures": {
+                    "type": "array"
+                },
+                "hero_image": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "generated_image": {
+                    "type": "string"
+                },
+                "diagram": {
+                    "type": "string"
+                },
+                "mermaid": {
+                    "type": "string"
+                },
+                "mermaid_source": {
+                    "type": "string"
+                }
+            }
+        },
+        "common": {
+            "type": "object",
+            "required": [
+                "type",
+                "title"
+            ],
+            "properties": {
+                "type": {
+                    "enum": [
+                        "title",
+                        "section",
+                        "content"
+                    ]
+                },
+                "variant": {
+                    "enum": [
+                        "standard",
+                        "cards-2",
+                        "cards-3",
+                        "split",
+                        "timeline",
+                        "stats",
+                        "kpi-hero",
+                        "table",
+                        "lab-run-results",
+                        "comparison-2col",
+                        "matrix",
+                        "flow",
+                        "chart",
+                        "image-sidebar",
+                        "scientific-figure",
+                        "generated-image"
+                    ]
+                },
+                "title": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "subtitle": {
+                    "type": "string"
+                },
+                "body": {
+                    "type": "string"
+                },
+                "bullets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/bullet"
+                    }
+                },
+                "paragraphs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "highlights": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "cards": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/card"
+                    }
+                },
+                "facts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/fact"
+                    }
+                },
+                "stats": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/fact"
+                    }
+                },
+                "milestones": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "quadrants": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "left": {
+                    "type": "object"
+                },
+                "right": {
+                    "type": "object"
+                },
+                "verdict": {
+                    "type": "string"
+                },
+                "value": {
+                    "$ref": "#/$defs/string_or_number"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "context": {
+                    "type": "string"
+                },
+                "headers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/string_or_number"
+                    }
+                },
+                "rows": {
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/$defs/string_or_number"
+                        }
+                    }
+                },
+                "table": {
+                    "oneOf": [
+                        {
+                            "$ref": "#/$defs/table"
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ]
+                },
+                "tables": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/table"
+                    }
+                },
+                "chart": {
+                    "oneOf": [
+                        {
+                            "$ref": "#/$defs/chart"
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ]
+                },
+                "figures": {
+                    "type": "array"
+                },
+                "assets": {
+                    "$ref": "#/$defs/assets"
+                },
+                "background_image": {
+                    "type": "string"
+                },
+                "hero_image": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "caption": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "takeaway": {
+                    "type": "string"
+                },
+                "interpretation": {
+                    "type": "string"
+                },
+                "summary_callout": {
+                    "type": "string"
+                },
+                "footer": {
+                    "type": "string"
+                },
+                "sources": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "refs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "visual_intent": {
+                    "type": "string"
+                },
+                "claim_ids": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string",
+                        "minLength": 1
+                    }
+                },
+                "image_generation": {
+                    "type": "object"
+                },
+                "header_mode": {
+                    "enum": [
+                        "bar",
+                        "stack",
+                        "eyebrow",
+                        "lab-clean",
+                        "lab-card"
+                    ]
+                },
+                "page_system": {
+                    "enum": [
+                        "clinical-rail",
+                        "board-ledger",
+                        "editorial-field",
+                        "command-canvas",
+                        "lab-plate",
+                        "investor-thesis",
+                        "none"
+                    ]
+                },
+                "header_variant": {
+                    "enum": [
+                        "auto",
+                        "left-accent",
+                        "split-rule",
+                        "title-rule",
+                        "side-rail",
+                        "top-bottom-rule",
+                        "plain"
+                    ]
+                },
+                "header_variants": {
+                    "type": "array",
+                    "items": {
+                        "enum": [
+                            "auto",
+                            "left-accent",
+                            "split-rule",
+                            "title-rule",
+                            "side-rail",
+                            "top-bottom-rule",
+                            "plain"
+                        ]
+                    }
+                },
+                "title_layout": {
+                    "enum": [
+                        "split-hero",
+                        "lab-plate",
+                        "command-center",
+                        "poster",
+                        "masthead",
+                        "light-atlas"
+                    ]
+                },
+                "timeline_mode": {
+                    "enum": [
+                        "rail-cards",
+                        "staggered",
+                        "open-events",
+                        "bands",
+                        "chapter-spread"
+                    ]
+                },
+                "matrix_mode": {
+                    "enum": [
+                        "cards",
+                        "open-quadrants"
+                    ]
+                },
+                "stats_mode": {
+                    "enum": [
+                        "tiles",
+                        "feature-left",
+                        "policy-bands"
+                    ]
+                },
+                "cards_mode": {
+                    "enum": [
+                        "feature-left",
+                        "staggered-row"
+                    ]
+                },
+                "chart_treatment": {
+                    "enum": [
+                        "standard",
+                        "facts-below",
+                        "facts-right",
+                        "minimal",
+                        "hero-stat",
+                        "threshold-band",
+                        "sparse-wide"
+                    ]
+                },
+                "table_treatment": {
+                    "enum": [
+                        "standard",
+                        "compact-ledger",
+                        "readout-sidecar",
+                        "decision-matrix",
+                        "journal-grid"
+                    ]
+                },
+                "footer_mode": {
+                    "enum": [
+                        "standard",
+                        "source-line",
+                        "none"
+                    ]
+                },
+                "summary_callout_mode": {
+                    "enum": [
+                        "default",
+                        "lab-box"
+                    ]
+                },
+                "figure_table_treatment": {
+                    "enum": [
+                        "figure-first",
+                        "table-first",
+                        "stats-strip",
+                        "image-sidebar"
+                    ]
+                },
+                "image_sidebar_mode": {
+                    "enum": [
+                        "analysis-rail",
+                        "evidence-mosaic",
+                        "editorial-atlas"
+                    ]
+                },
+                "comparison_mode": {
+                    "enum": [
+                        "open-columns",
+                        "scorecard"
+                    ]
+                }
+            }
+        },
+        "title_slide": {
+            "allOf": [
+                {
+                    "$ref": "#/$defs/common"
+                },
+                {
+                    "properties": {
+                        "type": {
+                            "const": "title"
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "title"
+                    ]
+                }
+            ],
+            "unevaluatedProperties": false
+        },
+        "section_slide": {
+            "allOf": [
+                {
+                    "$ref": "#/$defs/common"
+                },
+                {
+                    "properties": {
+                        "type": {
+                            "const": "section"
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "title"
+                    ]
+                }
+            ],
+            "unevaluatedProperties": false
+        },
+        "content_slide": {
+            "allOf": [
+                {
+                    "$ref": "#/$defs/common"
+                },
+                {
+                    "properties": {
+                        "type": {
+                            "const": "content"
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "variant",
+                        "title",
+                        "claim_ids"
+                    ]
+                },
+                {
+                    "allOf": [
+                        {
+                            "if": {
+                                "properties": {
+                                    "variant": {
+                                        "enum": [
+                                            "cards-2",
+                                            "cards-3"
+                                        ]
+                                    }
+                                }
+                            },
+                            "then": {
+                                "required": [
+                                    "cards"
+                                ]
+                            }
+                        },
+                        {
+                            "if": {
+                                "properties": {
+                                    "variant": {
+                                        "const": "timeline"
+                                    }
+                                }
+                            },
+                            "then": {
+                                "required": [
+                                    "milestones"
+                                ]
+                            }
+                        },
+                        {
+                            "if": {
+                                "properties": {
+                                    "variant": {
+                                        "const": "stats"
+                                    }
+                                }
+                            },
+                            "then": {
+                                "anyOf": [
+                                    {
+                                        "required": [
+                                            "facts"
+                                        ]
+                                    },
+                                    {
+                                        "required": [
+                                            "stats"
+                                        ]
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "if": {
+                                "properties": {
+                                    "variant": {
+                                        "const": "kpi-hero"
+                                    }
+                                }
+                            },
+                            "then": {
+                                "required": [
+                                    "value",
+                                    "label"
+                                ]
+                            }
+                        },
+                        {
+                            "if": {
+                                "properties": {
+                                    "variant": {
+                                        "const": "table"
+                                    }
+                                }
+                            },
+                            "then": {
+                                "anyOf": [
+                                    {
+                                        "required": [
+                                            "table"
+                                        ]
+                                    },
+                                    {
+                                        "required": [
+                                            "headers",
+                                            "rows"
+                                        ]
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "if": {
+                                "properties": {
+                                    "variant": {
+                                        "const": "lab-run-results"
+                                    }
+                                }
+                            },
+                            "then": {
+                                "required": [
+                                    "tables"
+                                ]
+                            }
+                        },
+                        {
+                            "if": {
+                                "properties": {
+                                    "variant": {
+                                        "const": "comparison-2col"
+                                    }
+                                }
+                            },
+                            "then": {
+                                "required": [
+                                    "left",
+                                    "right"
+                                ]
+                            }
+                        },
+                        {
+                            "if": {
+                                "properties": {
+                                    "variant": {
+                                        "const": "matrix"
+                                    }
+                                }
+                            },
+                            "then": {
+                                "required": [
+                                    "quadrants"
+                                ]
+                            }
+                        },
+                        {
+                            "if": {
+                                "properties": {
+                                    "variant": {
+                                        "const": "chart"
+                                    }
+                                }
+                            },
+                            "then": {
+                                "anyOf": [
+                                    {
+                                        "required": [
+                                            "chart"
+                                        ]
+                                    },
+                                    {
+                                        "properties": {
+                                            "assets": {
+                                                "anyOf": [
+                                                    {
+                                                        "required": [
+                                                            "chart"
+                                                        ]
+                                                    },
+                                                    {
+                                                        "required": [
+                                                            "chart_data"
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "required": [
+                                            "assets"
+                                        ]
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "if": {
+                                "properties": {
+                                    "variant": {
+                                        "const": "flow"
+                                    }
+                                }
+                            },
+                            "then": {
+                                "properties": {
+                                    "assets": {
+                                        "anyOf": [
+                                            {
+                                                "required": [
+                                                    "diagram"
+                                                ]
+                                            },
+                                            {
+                                                "required": [
+                                                    "mermaid"
+                                                ]
+                                            },
+                                            {
+                                                "required": [
+                                                    "mermaid_source"
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "assets"
+                                ]
+                            }
+                        },
+                        {
+                            "if": {
+                                "properties": {
+                                    "variant": {
+                                        "const": "image-sidebar"
+                                    }
+                                }
+                            },
+                            "then": {
+                                "properties": {
+                                    "assets": {
+                                        "anyOf": [
+                                            {
+                                                "required": [
+                                                    "hero_image"
+                                                ]
+                                            },
+                                            {
+                                                "required": [
+                                                    "image"
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "assets"
+                                ]
+                            }
+                        },
+                        {
+                            "if": {
+                                "properties": {
+                                    "variant": {
+                                        "const": "generated-image"
+                                    }
+                                }
+                            },
+                            "then": {
+                                "properties": {
+                                    "assets": {
+                                        "required": [
+                                            "generated_image"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "assets"
+                                ]
+                            }
+                        },
+                        {
+                            "if": {
+                                "properties": {
+                                    "variant": {
+                                        "const": "scientific-figure"
+                                    }
+                                }
+                            },
+                            "then": {
+                                "anyOf": [
+                                    {
+                                        "required": [
+                                            "figures"
+                                        ]
+                                    },
+                                    {
+                                        "properties": {
+                                            "assets": {
+                                                "required": [
+                                                    "figures"
+                                                ]
+                                            }
+                                        },
+                                        "required": [
+                                            "assets"
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ],
+            "unevaluatedProperties": false
+        },
+        "slide": {
+            "oneOf": [
+                {
+                    "$ref": "#/$defs/title_slide"
+                },
+                {
+                    "$ref": "#/$defs/section_slide"
+                },
+                {
+                    "$ref": "#/$defs/content_slide"
+                }
+            ]
+        }
+    }
+}

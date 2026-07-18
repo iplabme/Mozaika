@@ -1,0 +1,11 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.ouroboros_env/
+
+# Local task and review reports. Keep them on disk, never publish them.
+**/task*.md
+**/review*.md
+
+# This is a runtime instruction referenced by the Mozaika skill, not a review report.
+!skills/mozaika/references/review-and-evolution.md

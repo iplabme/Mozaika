@@ -1,0 +1,45 @@
+:root {
+  color-scheme: light;
+  --mozaika-canvas: #faf9f5;
+  --mozaika-ink: #141413;
+  --mozaika-muted: #5e5d59;
+  --mozaika-surface-warm: #f0eee6;
+  --mozaika-surface-white: #ffffff;
+  --mozaika-mint-soft: #e8f0ed;
+  --mozaika-line: rgba(20, 20, 19, 0.18);
+
+  --mozaika-green-700: #388f76;
+  --mozaika-green-500: #59b295;
+  --mozaika-green-300: #89d1b9;
+  --mozaika-green-100: #bee5d8;
+  --mozaika-lavender: #c9c4f5;
+  --mozaika-sage: #a1af8e;
+  --mozaika-rose: #d787a3;
+  --mozaika-blue: #7fa9d2;
+  --mozaika-sand: #e3dacc;
+  --mozaika-lime: #d9f2a4;
+
+  --mozaika-font-display: Inter, "Helvetica Neue", Arial, sans-serif;
+  --mozaika-font-reading: Georgia, "Times New Roman", serif;
+  --mozaika-font-ui: Inter, "Helvetica Neue", Arial, sans-serif;
+
+  --mozaika-radius-small: 8px;
+  --mozaika-radius-card: 16px;
+  --mozaika-space-1: 0.5rem;
+  --mozaika-space-2: 1rem;
+  --mozaika-space-3: 1.5rem;
+  --mozaika-space-4: 2.5rem;
+  --mozaika-space-5: 4rem;
+  --mozaika-focus: 3px solid #388f76;
+
+  /* Owner-approved weekly-autopilot reference aliases. */
+  --mozaika-weekly-canvas: #f4f1ec;
+  --mozaika-weekly-ink: #3d3a42;
+  --mozaika-weekly-muted: #7d7774;
+  --mozaika-weekly-line: #eae3d9;
+  --mozaika-weekly-lavender: #b8aee0;
+  --mozaika-weekly-sage: #a8c6a1;
+  --mozaika-weekly-rose: #dfa5ae;
+  --mozaika-weekly-blue: #9fc0de;
+  --mozaika-weekly-gold: #e3c88a;
+}

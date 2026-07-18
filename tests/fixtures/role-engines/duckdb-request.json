@@ -1,0 +1,10 @@
+{
+  "contract_version": "mozaika-duckdb-request/v1",
+  "output": "duckdb-result.json",
+  "sources": [
+    {"source_id": "sample", "location": "sample.csv", "format": "csv"}
+  ],
+  "queries": [
+    {"query_id": "totals", "sql": "SELECT category, SUM(value) AS total FROM sample GROUP BY category ORDER BY total DESC"}
+  ]
+}

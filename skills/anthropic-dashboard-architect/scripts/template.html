@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{DASHBOARD_TITLE}}</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+/* ============ THEME TOKENS — swap block A or B ============ */
+:root{
+  /* THEME A — Warm Neutral (executive) */
+  --bg:#ECE7DC; --panel:#FBF9F4; --panel-2:#F4F1E8; --border:#C9A86A;
+  --ink:#4A4A42; --muted:#9A9486; --accent:#8FB48A; --accent-2:#D9C28A;
+  --good:#7FA874; --warn:#E0B450; --bad:#D08770;
+  --panel-radius:14px; --panel-border:2px solid var(--border);
+}
+/* To use THEME B (Operational/Sber), replace :root above with:
+:root{
+  --bg:#EEF1F4; --panel:#FFFFFF; --panel-2:#F7F9FB; --border:#E3E8EE;
+  --ink:#1F2A37; --muted:#7B8794; --accent:#2E7D5B; --accent-2:#3B82C4;
+  --good:#2E9E6B; --warn:#E0A82E; --bad:#E5484D;
+  --panel-radius:16px; --panel-border:1px solid var(--border);
+}
+*/
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);color:var(--ink);padding:18px;font-size:13px;}
+.wrap{max-width:1440px;margin:0 auto;}
+.dash-header{margin-bottom:14px;}
+.dash-header h1{font-size:22px;font-weight:800;}
+.dash-header .sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.grid-3{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:12px;}
+.col{display:flex;flex-direction:column;gap:12px;}
+.panel{background:var(--panel);border-radius:var(--panel-radius);border:var(--panel-border);padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+.ptitle{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+.pill{font-size:10px;padding:3px 9px;border-radius:20px;background:var(--panel-2);color:var(--muted);font-weight:600;}
+
+/* KPI tile */
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.kpi{background:var(--panel);border-radius:var(--panel-radius);border:var(--panel-border);padding:16px;}
+.kpi .label{font-size:11px;text-transform:uppercase;color:var(--muted);font-weight:600;}
+.kpi .num{font-size:34px;font-weight:800;line-height:1.1;margin-top:4px;}
+.kpi .delta{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:12px;margin-top:6px;}
+.delta.up{background:rgba(127,168,116,.18);color:var(--good);}
+.delta.down{background:rgba(208,135,112,.18);color:var(--bad);}
+
+/* horizontal bar list */
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.bar-row .lbl{width:120px;font-size:12px;color:var(--ink);}
+.bar-track{flex:1;height:16px;background:var(--panel-2);border-radius:5px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:5px;background:var(--accent);}
+.bar-row .val{min-width:38px;text-align:right;font-size:12px;font-weight:600;}
+
+/* bullet (факт vs цель) */
+.bullet{margin-bottom:12px;}
+.bullet .top{display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;}
+.bullet-track{position:relative;height:14px;background:var(--panel-2);border-radius:7px;}
+.bullet-fill{height:100%;border-radius:7px;background:var(--accent);}
+.bullet-target{position:absolute;top:-2px;width:2px;height:18px;background:var(--ink);}
+
+/* attention cards */
+.attn{display:flex;align-items:flex-start;gap:10px;padding:12px;border-radius:12px;margin-bottom:8px;}
+.attn .ico{font-size:18px;}
+.attn .body{flex:1;}
+.attn .head{font-weight:700;font-size:13px;}
+.attn .sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.sev{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;}
+.sev.urgent{background:#FCE8E8;color:#C0392B;} .attn.urgent{background:rgba(229,72,77,.06);}
+.sev.important{background:#FFF6E5;color:#B7791F;} .attn.important{background:rgba(224,168,46,.07);}
+.sev.gap{background:#EEF2F7;color:#5A6B7B;} .attn.gap{background:rgba(90,107,123,.05);}
+.sev.ok{background:#E8F6EE;color:#2E9E6B;} .attn.ok{background:rgba(46,158,107,.06);}
+
+/* heatmap */
+.heat{display:grid;gap:4px;}
+.heat-cell{padding:12px 0;text-align:center;border-radius:8px;font-weight:700;font-size:15px;}
+.heat-head{font-size:11px;color:var(--muted);text-align:center;font-weight:600;padding-bottom:4px;}
+
+/* donuts */
+.donut-row{display:flex;justify-content:space-around;gap:8px;flex-wrap:wrap;}
+.donut-item{text-align:center;}
+.donut-box{position:relative;width:76px;height:76px;margin:0 auto;}
+.donut-box .ctr{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:13px;font-weight:800;}
+.donut-item .cap{font-size:10px;color:var(--muted);margin-top:4px;}
+
+/* metrics table */
+table.metrics{width:100%;border-collapse:collapse;font-size:12px;}
+table.metrics th{text-align:left;font-size:10px;text-transform:uppercase;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--border);}
+table.metrics td{padding:9px 10px;border-bottom:1px solid var(--panel-2);}
+.tag{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:600;background:#E8F6EE;color:#2E9E6B;}
+
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.compare .box{background:var(--panel-2);border-radius:12px;padding:18px;text-align:center;}
+.compare .big{font-size:46px;font-weight:800;}
+.note{background:var(--panel-2);border-radius:10px;padding:10px 12px;font-size:11px;color:var(--muted);margin-top:8px;}
+canvas{max-width:100%;}
+@media(max-width:1000px){.grid-3{grid-template-columns:1fr;}.kpi-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="dash-header">
+    <h1>{{DASHBOARD_TITLE}}</h1>
+    <div class="sub">{{SUBTITLE — период · источник · аудитория}}</div>
+  </div>
+
+  <div class="grid-3">
+    <!-- LEFT COLUMN: status breakdowns, significance -->
+    <div class="col">
+      <div class="panel">
+        <div class="ptitle">Портфель по статусам <span class="pill">{{TOTAL}} ед.</span></div>
+        <!-- repeat .bar-row per status -->
+      </div>
+    </div>
+
+    <!-- MIDDLE COLUMN: KPIs, hero trend, funnel -->
+    <div class="col">
+      <div class="kpi-grid">
+        <!-- repeat .kpi -->
+      </div>
+      <div class="panel">
+        <div class="ptitle">Динамика метрики</div>
+        <div style="height:180px;"><canvas id="trend"></canvas></div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: donuts, attention cards, gauges -->
+    <div class="col">
+      <div class="panel">
+        <div class="ptitle">Требуют внимания сейчас</div>
+        <!-- repeat .attn cards with severities -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---- helpers ---- */
+const css = v => getComputedStyle(document.body).getPropertyValue(v).trim();
+function donut(id,pct,color){
+  new Chart(document.getElementById(id),{type:'doughnut',
+    data:{datasets:[{data:[pct,100-pct],backgroundColor:[color,css('--panel-2')],borderWidth:0}]},
+    options:{cutout:'72%',plugins:{legend:{display:false},tooltip:{enabled:false}}}});
+}
+function spark(id,data,color){
+  new Chart(document.getElementById(id),{type:'line',
+    data:{labels:data.map((_,i)=>i),datasets:[{data,borderColor:color,borderWidth:2,pointRadius:0,tension:.4}]},
+    options:{plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}}});
+}
+/* Example trend chart */
+// new Chart(document.getElementById('trend'),{type:'bar', ... });
+</script>
+</body>
+</html>
